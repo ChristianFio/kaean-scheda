@@ -699,7 +699,7 @@ const SPELLS = [
   {id:'rinascita',n:'Rinascita',l:3,t:'Azione • contatto',d:'Riporta in vita a 1 PF una creatura morta da meno di 1 minuto. Consuma il diamante da 300 mo. A Barovia si risveglia urlando.',dom:1},
   {id:'guardiani',n:'Guardiani Spirituali',l:3,t:'Azione • emanazione 4,5 m',c:1,d:`I nemici che entrano o finiscono il turno nell'area: TS Saggezza CD ${DC}, metà se riescono. Velocità dimezzata.`,dmg:L=>`${L}d8`,dt:'radiosi'},
   {id:'dissolvi',n:'Dissolvi Magie',l:3,t:'Azione • 36 m',d:`Termina un incantesimo di 3° o inferiore; superiore: prova di Saggezza CD 10 + livello.`},
-  {id:'rimuovi',n:'Rimuovi Maledizione',l:3,t:'Azione • contatto',d:'Termina tutte le maledizioni sulla creatura. Contro la licantropia.'}
+  {id:'luce',n:'Luce Diurna',l:3,t:'Azione • 18 m • 1 ora',d:'Luce solare: sfera di 18 m di luce intensa più 18 m di luce fioca. Non richiede concentrazione. Contro i vampiri: 20 danni radiosi a inizio turno, svantaggio, niente rigenerazione.'}
 ];
 
 // Full spell descriptions (D&D 2024), paraphrased.
@@ -781,6 +781,10 @@ const INFO = {
     full:['Scegli una creatura, un oggetto o un effetto magico entro gittata.','Ogni incantesimo di 3° livello o inferiore sul bersaglio termina.',`Per ogni incantesimo di 4° livello o superiore fai una prova di Saggezza (${fmt(M.sag)}) con CD 10 + il livello dell\'incantesimo: se riesce, termina.`],
     up:'Con uno slot superiore termini automaticamente gli incantesimi di livello pari o inferiore allo slot.',
     tip:'Contro charme, maledizioni magiche e protezioni degli incantatori nemici.'},
+  luce:{s:'Evocazione',ct:'Azione',rg:'18 m',cp:'V, S',du:'1 ora (senza concentrazione)',
+    full:['Da un punto entro gittata si diffonde luce solare: luce intensa in una sfera di 18 m di raggio e luce fioca per altri 18 m.','In alternativa scegli un oggetto che nessuno indossa o tiene in mano: la luce si irradia dall\'oggetto per 18 m e si sposta con lui. Se copri l\'oggetto con qualcosa di opaco, la luce è bloccata.','Se la sfera tocca un\'area di Oscurità creata da un incantesimo di 3° livello o inferiore, quell\'incantesimo termina.','Contro i vampiri (Ipersensibilità alla luce solare): chi inizia il turno nella luce solare subisce 20 danni radiosi, ha svantaggio ai tiri per colpire e alle prove, e non può rigenerarsi.'],
+    up:'Nessun effetto aggiuntivo con slot superiori.',
+    tip:'Combo Sole di Ilmater: lancialo prima di un covo su un sasso, tienilo in un sacchetto e tiralo fuori quando arrivano i vampiri. Non usa la concentrazione, quindi puoi attivare anche Guardiani Spirituali. Nella versione 2014 non era luce solare: verifica che il master usi quella 2024.'},
   rimuovi:{s:'Abiurazione',ct:'Azione',rg:'Contatto',cp:'V, S',du:'Istantanea',
     full:['Al tuo tocco terminano tutte le maledizioni che colpiscono una creatura o un oggetto.','Se l\'oggetto è un oggetto magico maledetto, la maledizione resta ma la sintonia del possessore si interrompe, così può liberarsene.'],
     tip:'Contro la licantropia (prima che la luna piena la renda permanente) e le maledizioni delle streghe di Barovia.'}
