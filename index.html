@@ -1201,11 +1201,6 @@ function renderCombat(){
       <span class="stepper"><button class="btn sm" data-a="insp-" aria-label="Togli ispirazione">−</button><b>${S.insp}</b><button class="btn sm" data-a="insp+" aria-label="Aggiungi ispirazione">+</button></span></div>
     <div class="btns" style="margin-top:10px">${cbtn('short','Riposo breve')}<button class="info" data-a="resinfo" data-id="short" aria-label="Dettagli: Riposo breve">i</button>${cbtn('long','Riposo lungo','btn primary')}<button class="info" data-a="resinfo" data-id="long" aria-label="Dettagli: Riposo lungo">i</button></div>
   </div>
-  <div class="panel hero ${heroCls}">
-    <figure>${PORTRAIT ? `<img src="${PORTRAIT}" alt="Ritratto di Kaean">` : ''}
-      ${heroState ? `<span class="state">${heroState}</span>` : ''}
-      <figcaption><b>Kaean</b><span>Medico, libraio e fedele di Ilmater</span></figcaption></figure>
-  </div>
   <div class="panel span2">
     <h2>Attacchi <small>CD incantesimi ${DC} • attacco ${fmt(SPELL_ATK)}</small></h2>
     <div class="tablewrap"><table>
