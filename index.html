@@ -135,6 +135,11 @@ main{padding-block:18px}
 .row .note{font-size:.75rem;color:var(--gold);margin-left:6px}
 .cols2{columns:2 230px;column-gap:24px}
 .cols2 .row,.cols2 .rowwrap{break-inside:avoid}
+.glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));column-gap:24px}
+.grow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dotted var(--rule);min-width:0}
+.grow .gn{min-width:0;font-size:.95rem}
+.grow .gn .muted{font-size:.82rem}
+.grow .info{width:26px;height:26px;font-size:.9rem}
 .rl{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
 .resline .info,.btns .info{width:26px;height:26px;font-size:.9rem}
 .rowwrap{display:flex;align-items:center;gap:6px;border-bottom:1px dotted var(--rule)}
@@ -892,6 +897,136 @@ const RES_INFO = {
     full:['Recuperi tutti i punti ferita, tutti i Dadi Vita, tutti gli slot e tutti gli usi di Canalizzare Divinità.','I punti ferita massimi ridotti (per esempio dal morso di un vampiro) tornano normali e l\'indebolimento scende di 1 livello.','Puoi cambiare gli incantesimi preparati.','Il riposo si interrompe se si tira l\'iniziativa, se lanci un incantesimo che non sia un trucchetto, se subisci danni o con 1 ora di cammino o fatica.','Nella scheda: il pulsante ripristina tutto e termina Aiuto e la concentrazione.'],
     tip:'Al risveglio: Aiuto su Kaean e due compagni (e dal livello 7 Interdizione alla Morte).'}
 };
+// Full cleric list (levels 0-3, D&D 2024): spells Kaean can prepare after a long rest.
+SPELLS.push(
+  {id:'rimuovi',n:'Rimuovi Maledizione',l:3,t:'Azione • contatto',d:'Termina tutte le maledizioni sulla creatura. Contro la licantropia.'},
+  {id:'xluce',n:'Luce',l:0,t:'Azione • contatto',x:1,d:'Un oggetto emette luce intensa per 6 m e fioca per altri 6 m per 1 ora.'},
+  {id:'xresist',n:'Resistenza',l:0,t:'Azione • contatto',c:1,x:1,d:'Riduce di 1d4 i danni di un tipo scelto, una volta per turno.'},
+  {id:'xsalvare',n:'Salvare i Morenti',l:0,t:'Azione • 9 m',x:1,d:'Stabilizza una creatura a 0 PF.'},
+  {id:'xrintocco',n:'Rintocco dei Morti',l:0,t:'Azione • 18 m',x:1,d:`TS Saggezza CD ${DC}: 2d8 necrotici, 2d12 se il bersaglio è ferito.`,dmg:()=>'2d8',dt:'necrotici (2d12 se ferito)'},
+  {id:'anatema',n:'Anatema',l:1,t:'Azione • 9 m',c:1,d:`Fino a 3 creature, TS Carisma CD ${DC}: sottraggono 1d4 a tiri per colpire e TS.`},
+  {id:'acqua',n:'Creare o Distruggere Acqua',l:1,t:'Azione • 9 m',d:'Crea fino a 40 litri d\'acqua o la distrugge, anche la nebbia.'},
+  {id:'dardo',n:'Dardo Guida',l:1,t:'Azione • 36 m',d:`Attacco con incantesimo ${fmt(SPELL_ATK)}: 4d6 radiosi e vantaggio al prossimo attacco contro il bersaglio.`,dmg:L=>`${3+L}d6`,dt:'radiosi'},
+  {id:'indbene',n:'Individuazione del Bene e del Male',l:1,t:'Azione • sé',c:1,d:'Percepisci aberrazioni, celestiali, elementali, folletti, immondi e non morti entro 9 m.'},
+  {id:'indvel',n:'Individuazione di Veleni e Malattie',l:1,t:'Azione • sé',c:1,r:1,d:'Percepisci veleni, creature velenose e malattie magiche entro 9 m.'},
+  {id:'infliggi',n:'Infliggi Ferite',l:1,t:'Azione • contatto',d:`TS Costituzione CD ${DC}: 2d10 necrotici, metà se riesce.`,dmg:L=>`${1+L}d10`,dt:'necrotici'},
+  {id:'purifica',n:'Purificare Cibo e Bevande',l:1,t:'Azione • 3 m',r:1,d:'Elimina veleno e marciume da cibo e bevande in una sfera di 1,5 m.'},
+  {id:'scudofede',n:'Scudo della Fede',l:1,t:'Azione bonus • 18 m',c:1,d:'+2 CA a una creatura per 10 minuti.'},
+  {id:'presagio',n:'Presagio',l:2,t:'1 minuto • sé',r:1,d:'Un presagio su un\'azione che farete entro 30 minuti: bene, male, entrambi o nulla.'},
+  {id:'cecita',n:'Cecità/Sordità',l:2,t:'Azione • 36 m',d:`TS Costituzione CD ${DC} o Accecato o Assordato per 1 minuto. Non richiede concentrazione.`},
+  {id:'calmare',n:'Calmare Emozioni',l:2,t:'Azione • 18 m',c:1,d:`Umanoidi in una sfera di 6 m, TS Carisma CD ${DC}: niente charme e paura, oppure niente ostilità.`},
+  {id:'fiamma2',n:'Fiamma Perenne',l:2,t:'Azione • contatto',d:'Una fiamma che non scalda né consuma, finché non viene dissolta. Polvere di rubino da 50 mo.'},
+  {id:'potenz',n:'Potenziamento',l:2,t:'Azione • contatto',c:1,d:'Vantaggio alle prove di una caratteristica per 1 ora.'},
+  {id:'trappole',n:'Trova Trappole',l:2,t:'Azione • 36 m',d:'Percepisci se ci sono trappole entro gittata e in linea di vista.'},
+  {id:'riposo',n:'Riposo Inviolato',l:2,t:'Azione • contatto',r:1,d:'Un cadavere non si decompone e non può diventare non morto per 10 giorni.'},
+  {id:'blocca',n:'Blocca Persone',l:2,t:'Azione • 18 m',c:1,d:`Un umanoide, TS Saggezza CD ${DC} o Paralizzato. Ripete il TS a fine turno.`},
+  {id:'localizza',n:'Localizza Oggetto',l:2,t:'Azione • sé',c:1,d:'Percepisci la direzione di un oggetto conosciuto entro 300 m.'},
+  {id:'protveleno',n:'Protezione dal Veleno',l:2,t:'Azione • contatto',d:'Termina Avvelenato; vantaggio ai TS contro il veleno e resistenza ai danni da veleno per 1 ora.'},
+  {id:'armaspir',n:'Arma Spirituale',l:2,t:'Azione bonus • 18 m',c:1,d:`Un\'arma spettrale attacca a ${fmt(SPELL_ATK)} per 1d8${fmt(M.sag)} forza, poi di nuovo con l\'azione bonus a ogni turno.`,dmg:L=>`${L-1}d8+${M.sag}`,dt:'forza'},
+  {id:'legame',n:'Legame di Interdizione',l:2,t:'Azione • contatto',d:'Il bersaglio ha +1 CA e TS e resistenza a tutti i danni, ma tu subisci gli stessi danni.'},
+  {id:'verita',n:'Zona di Verità',l:2,t:'Azione • 18 m',d:`Sfera di 4,5 m, TS Carisma CD ${DC}: chi fallisce non può mentire consapevolmente.`},
+  {id:'animare',n:'Animare Morti',l:3,t:'1 minuto • 3 m',d:'Crea uno scheletro o uno zombi che obbedisce per 24 ore.'},
+  {id:'faro',n:'Faro di Speranza',l:3,t:'Azione • 9 m',c:1,d:'Vantaggio ai TS di Saggezza e contro la morte; le cure ripristinano il massimo.'},
+  {id:'scagliare',n:'Scagliare Maledizione',l:3,t:'Azione • contatto',c:1,d:`TS Saggezza CD ${DC} o una maledizione a scelta, per esempio +1d8 necrotici dai tuoi attacchi.`},
+  {id:'chiarov',n:'Chiaroveggenza',l:3,t:'10 minuti • 1,5 km',c:1,d:'Un sensore invisibile per vedere o sentire un luogo lontano. Focus da 100 mo.'},
+  {id:'cibo',n:'Creare Cibo e Acqua',l:3,t:'Azione • 9 m',d:'Cibo e acqua per 15 umanoidi per un giorno.'},
+  {id:'morteapp',n:'Morte Apparente',l:3,t:'Azione • contatto',r:1,d:'Una creatura consenziente sembra morta per 1 ora e ha resistenza ai danni.'},
+  {id:'glifo',n:'Glifo di Interdizione',l:3,t:'1 ora • contatto',d:'Una trappola magica: esplosione o incantesimo immagazzinato. Polvere di diamante da 200 mo.'},
+  {id:'cerchio',n:'Cerchio Magico',l:3,t:'1 minuto • 3 m',d:'Un cilindro che tiene fuori (o dentro) non morti, immondi, folletti e altri. Argento e sale da 100 mo.'},
+  {id:'fondersi',n:'Fondersi nella Pietra',l:3,t:'Azione • contatto',r:1,d:'Entri in un blocco di pietra e ci resti nascosto fino a 8 ore.'},
+  {id:'protenergia',n:'Protezione dall\'Energia',l:3,t:'Azione • contatto',c:1,d:'Resistenza ad acido, freddo, fuoco, fulmine o tuono per 1 ora.'},
+  {id:'inviare',n:'Inviare',l:3,t:'Azione • illimitata',d:'Un messaggio di 25 parole a una creatura conosciuta, che può rispondere.'},
+  {id:'parlamorti',n:'Parlare con i Morti',l:3,t:'Azione • 3 m',d:'Un cadavere risponde a 5 domande con ciò che sapeva da vivo.'},
+  {id:'linguaggi',n:'Linguaggi',l:3,t:'Azione • contatto',d:'Per 1 ora capisci ogni lingua parlata e tutti ti capiscono.'},
+  {id:'camminare',n:'Camminare sull\'Acqua',l:3,t:'Azione • 9 m',r:1,d:'Fino a 10 creature camminano su acqua e liquidi per 1 ora.'}
+);
+Object.assign(INFO, {
+  xluce:{s:'Evocazione',ct:'Azione',rg:'Contatto',cp:'V, M (una lucciola o del muschio fosforescente)',du:'1 ora',
+    full:['Tocchi un oggetto non più grande di 3 m: emette luce intensa in un raggio di 6 m e luce fioca per altri 6 m.','Se copri l\'oggetto con qualcosa di opaco, la luce è bloccata.'],tip:'Kaean ha scurovisione, ma i compagni no. Si può prendere al posto di un trucchetto quando sali di livello.'},
+  xresist:{s:'Abiurazione',ct:'Azione',rg:'Contatto',cp:'V, S',du:'Concentrazione, fino a 1 minuto',
+    full:['Tocchi una creatura e scegli un tipo di danno (per esempio necrotico).','Finché dura, la prima volta in ogni turno che la creatura subisce quel tipo di danno, lo riduce di 1d4.'],tip:'Toglie la concentrazione a Guardiani Spirituali: poco utile per Kaean.'},
+  xsalvare:{s:'Necromanzia',ct:'Azione',rg:'4,5 m (9 m dal livello 5)',cp:'V, S',du:'Istantanea',
+    full:['Una creatura a 0 punti ferita entro gittata diventa stabile.','La gittata raddoppia ai livelli 5, 11 e 17.'],tip:'Il kit del guaritore fa la stessa cosa senza spendere un trucchetto.'},
+  xrintocco:{s:'Necromanzia',ct:'Azione',rg:'18 m',cp:'V, S',du:'Istantanea',
+    full:[`Un rintocco di campana funebre: il bersaglio fa un TS di Saggezza (CD ${DC}).`,'Se fallisce subisce 1d8 danni necrotici, oppure 1d12 se ha già perso dei punti ferita.'],up:'Danni: 2 dadi al livello 5 (Kaean ora), 3 all\'11, 4 al 17.',
+    tip:'Molti non morti di Barovia resistono ai danni necrotici: Fiamma Sacra e Parola Radiosa rendono di più.'},
+  anatema:{s:'Ammaliamento',ct:'Azione',rg:'9 m',cp:'V, S, M (una goccia di sangue)',du:'Concentrazione, fino a 1 minuto',
+    full:[`Fino a tre creature entro gittata fanno un TS di Carisma (CD ${DC}).`,'Chi fallisce sottrae 1d4 da ogni tiro per colpire e tiro salvezza per la durata.'],up:'+1 bersaglio per ogni livello di slot sopra il 1°.',tip:'L\'opposto di Benedizione. Compete con Guardiani Spirituali per la concentrazione.'},
+  acqua:{s:'Trasmutazione',ct:'Azione',rg:'9 m',cp:'V, S, M (una goccia d\'acqua o un granello di sabbia)',du:'Istantanea',
+    full:['Crea fino a 40 litri d\'acqua potabile in un contenitore o come pioggia in un cubo di 9 m che spegne le fiamme libere.','Oppure distrugge fino a 40 litri d\'acqua in un contenitore, o disperde la nebbia in un cubo di 9 m.'],up:'Con slot superiori crei o distruggi più acqua.',tip:'Rituale da avventura: utile per acqua potabile e per diradare la nebbia per qualche istante.'},
+  dardo:{s:'Evocazione',ct:'Azione',rg:'36 m',cp:'V, S',du:'1 round',
+    full:[`Fai un attacco con incantesimo a distanza (${fmt(SPELL_ATK)}). Se colpisci, il bersaglio subisce 4d6 danni radiosi.`,'Il prossimo tiro per colpire contro di lui prima della fine del tuo prossimo turno ha vantaggio.'],up:'+1d6 per ogni livello di slot sopra il 1°.',
+    tip:'Il miglior colpo singolo radioso di 1° livello, ottimo contro un vampiro. Costa uno slot che altrimenti andrebbe in cure.'},
+  indbene:{s:'Divinazione',ct:'Azione',rg:'Sé',cp:'V, S',du:'Concentrazione, fino a 10 minuti',
+    full:['Percepisci la posizione e il tipo di ogni aberrazione, celestiale, elementale, folletto, immondo o non morto entro 9 m.','Percepisci anche luoghi e oggetti consacrati o profanati.','È bloccato da 30 cm di pietra o terra, 2,5 cm di metallo o un foglio di piombo.'],
+    tip:'A Barovia scopre i vampiri nascosti e i non morti dietro le porte. Un ottimo incantesimo da esplorazione.'},
+  indvel:{s:'Divinazione',ct:'Azione (o rituale +10 minuti)',rg:'Sé',cp:'V, S, M (una foglia di tasso)',du:'Concentrazione, fino a 10 minuti',
+    full:['Percepisci la posizione di veleni, creature velenose o che iniettano veleno, e malattie magiche entro 9 m, e ne riconosci il tipo.'],tip:'Utile prima di mangiare cibo barovano sospetto.'},
+  infliggi:{s:'Necromanzia',ct:'Azione',rg:'Contatto',cp:'V, S',du:'Istantanea',
+    full:[`La creatura che tocchi fa un TS di Costituzione (CD ${DC}): 2d10 danni necrotici se fallisce, metà se riesce.`],up:'+1d10 per ogni livello di slot sopra il 1°.',tip:'Molti non morti resistono o sono immuni al necrotico: contro di loro è quasi inutile.'},
+  purifica:{s:'Trasmutazione',ct:'Azione (o rituale +10 minuti)',rg:'3 m',cp:'V, S',du:'Istantanea',
+    full:['Rimuove veleno e marciume da tutto il cibo e le bevande non magici in una sfera di 1,5 m.'],tip:'Da lanciare come rituale nelle locande barovane.'},
+  scudofede:{s:'Abiurazione',ct:'Azione bonus',rg:'18 m',cp:'V, S, M (una preghiera scritta)',du:'Concentrazione, fino a 10 minuti',
+    full:['Una creatura a tua scelta ottiene +2 alla CA per la durata.'],tip:'CA 22 per Kaean o protezione per il mago, ma richiede concentrazione: niente Guardiani Spirituali.'},
+  presagio:{s:'Divinazione',ct:'1 minuto (o rituale +10 minuti)',rg:'Sé',cp:'V, S, M (bastoncini, ossa o carte segnati da 25 mo)',du:'Istantanea',
+    full:['Ricevi un presagio su un\'azione specifica che farete nei prossimi 30 minuti: Bene, Male, Bene e male, oppure Indifferente.','Ogni lancio aggiuntivo prima di un riposo lungo ha una probabilità crescente di dare un responso casuale.'],tip:'A Barovia gli dei aiutano poco: chiedi al master come funziona.'},
+  cecita:{s:'Trasmutazione',ct:'Azione',rg:'36 m',cp:'V',du:'1 minuto',
+    full:[`Una creatura fa un TS di Costituzione (CD ${DC}). Se fallisce è Accecata o Assordata (a tua scelta).`,'Alla fine di ogni suo turno ripete il TS e, se riesce, l\'effetto termina.'],up:'+1 bersaglio per ogni livello di slot sopra il 2°.',tip:'Non richiede concentrazione: si combina con Guardiani Spirituali. Accecare un nemico gli dà svantaggio agli attacchi.'},
+  calmare:{s:'Ammaliamento',ct:'Azione',rg:'18 m',cp:'V, S',du:'Concentrazione, fino a 1 minuto',
+    full:[`Gli umanoidi in una sfera di 6 m fanno un TS di Carisma (CD ${DC}). Su chi fallisce scegli un effetto:`,'• sopprimi gli effetti di charme e paura;','• oppure la creatura diventa indifferente verso chi le era ostile (finisce se viene attaccata o danneggiata).'],tip:'Utile per calmare una folla di paesani terrorizzati o un compagno spaventato.'},
+  fiamma2:{s:'Evocazione',ct:'Azione',rg:'Contatto',cp:'V, S, M (polvere di rubino da 50 mo, consumata)',du:'Finché non viene dissolta',
+    full:['Una fiamma luminosa come una torcia appare su un oggetto. Non produce calore e non consuma nulla.'],tip:'Costa 50 mo: per ora Kaean non se la può permettere.'},
+  potenz:{s:'Trasmutazione',ct:'Azione',rg:'Contatto',cp:'V, S, M (pelo o piuma di un animale)',du:'Concentrazione, fino a 1 ora',
+    full:['Scegli una caratteristica: la creatura che tocchi ha vantaggio alle prove di quella caratteristica.'],up:'+1 bersaglio per ogni livello di slot sopra il 2°.',tip:'Per una prova lunga e importante fuori dal combattimento.'},
+  trappole:{s:'Divinazione',ct:'Azione',rg:'36 m',cp:'V, S',du:'Istantanea',
+    full:['Percepisci se in gittata e in linea di vista c\'è una trappola, ma non dove si trova esattamente.'],tip:'Meglio la Percezione passiva 17 e Indagare dei compagni.'},
+  riposo:{s:'Necromanzia',ct:'Azione (o rituale +10 minuti)',rg:'Contatto',cp:'V, S, M (sale e una moneta di rame per occhio)',du:'10 giorni',
+    full:['Un cadavere è protetto dalla decomposizione e non può diventare un non morto.','I giorni passati sotto questo incantesimo non contano per i limiti di tempo degli incantesimi di resurrezione.'],tip:'A Barovia i morti si rialzano: proteggi i corpi dei compagni caduti.'},
+  blocca:{s:'Ammaliamento',ct:'Azione',rg:'18 m',cp:'V, S, M (un pezzo di ferro dritto)',du:'Concentrazione, fino a 1 minuto',
+    full:[`Un umanoide fa un TS di Saggezza (CD ${DC}): se fallisce è Paralizzato.`,'Alla fine di ogni suo turno ripete il TS e, se riesce, l\'effetto termina.','I colpi in mischia contro una creatura paralizzata sono critici automatici.'],up:'+1 bersaglio umanoide per ogni livello di slot sopra il 2°.',tip:'Fortissimo contro banditi, cultisti e Vistani ostili. Non funziona sui non morti.'},
+  localizza:{s:'Divinazione',ct:'Azione',rg:'Sé',cp:'V, S, M (un ramoscello biforcuto)',du:'Concentrazione, fino a 10 minuti',
+    full:['Percepisci la direzione di un oggetto che conosci entro 300 m, oppure dell\'oggetto più vicino di un tipo (per esempio una chiave).','Il piombo blocca l\'incantesimo.'],tip:'Utile per ritrovare oggetti rubati o specifici.'},
+  protveleno:{s:'Abiurazione',ct:'Azione',rg:'Contatto',cp:'V, S',du:'1 ora',
+    full:['La creatura che tocchi smette di essere Avvelenata.','Per la durata ha vantaggio ai TS contro l\'avvelenamento e resistenza ai danni da veleno.'],tip:'Ristorare Inferiore toglie già l\'avvelenamento; questo protegge anche per un\'ora.'},
+  armaspir:{s:'Evocazione',ct:'Azione bonus',rg:'18 m',cp:'V, S',du:'Concentrazione, fino a 1 minuto',
+    full:[`Crei un\'arma spettrale fluttuante. Quando la crei fai un attacco con incantesimo in mischia (${fmt(SPELL_ATK)}): 1d8${fmt(M.sag)} danni di forza.`,'Nei turni successivi, con l\'azione bonus, la sposti di 6 m e attacchi di nuovo.'],up:'+1d8 per ogni livello di slot sopra il 2°.',tip:'Nel 2024 richiede concentrazione: compete con Guardiani Spirituali, che è più forte.'},
+  legame:{s:'Abiurazione',ct:'Azione',rg:'Contatto',cp:'V, S, M (due anelli di platino da 50 mo, indossati da entrambi)',du:'1 ora',
+    full:['La creatura ha +1 alla CA e ai TS e resistenza a tutti i danni.','Ogni volta che subisce danni, tu subisci la stessa quantità.','Termina se vi allontanate di oltre 18 m o se scendi a 0 PF.'],tip:'Proteggerebbe il tuo signore, ma costa 100 mo di anelli e i danni li prendi tu.'},
+  verita:{s:'Ammaliamento',ct:'Azione',rg:'18 m',cp:'V, S',du:'10 minuti',
+    full:[`Una sfera di 4,5 m: chi ci entra fa un TS di Carisma (CD ${DC}). Se fallisce non può mentire consapevolmente.`,'Sai chi ha fallito. Una creatura può evitare di rispondere.'],tip:'Per interrogare i sospetti. Gli abitanti di Barovia nascondono molto.'},
+  animare:{s:'Necromanzia',ct:'1 minuto',rg:'3 m',cp:'V, S, M (una goccia di sangue, un pezzo di carne e polvere d\'ossa)',du:'Istantanea',
+    full:['Trasformi un mucchio di ossa o un cadavere in uno scheletro o uno zombi che obbedisce ai tuoi ordini per 24 ore.'],tip:'Un chierico di Ilmater che crea non morti a Barovia? Pessima idea, anche per la storia.'},
+  faro:{s:'Abiurazione',ct:'Azione',rg:'9 m',cp:'V, S',du:'Concentrazione, fino a 1 minuto',
+    full:['Qualsiasi numero di creature entro gittata ha vantaggio ai TS di Saggezza e ai TS contro la morte.','Quando recuperano PF con una cura, recuperano il massimo possibile.'],tip:'Con le cure massime di Kaean è fortissimo, ma toglie la concentrazione a Guardiani Spirituali.'},
+  scagliare:{s:'Necromanzia',ct:'Azione',rg:'Contatto',cp:'V, S',du:'Concentrazione, fino a 1 minuto',
+    full:[`La creatura che tocchi fa un TS di Saggezza (CD ${DC}). Se fallisce scegli una maledizione:`,'• svantaggio a prove e TS di una caratteristica;','• svantaggio ai tiri per colpire contro di te;','• all\'inizio di ogni suo turno TS di Saggezza o perde l\'azione;','• i tuoi attacchi e incantesimi le fanno 1d8 danni necrotici in più.'],up:'Con slot superiori dura molto di più.',tip:'Al contatto e con concentrazione: per Kaean meglio Guardiani Spirituali.'},
+  chiarov:{s:'Divinazione',ct:'10 minuti',rg:'1,5 km',cp:'V, S, M (un focus da 100 mo)',du:'Concentrazione, fino a 10 minuti',
+    full:['Crei un sensore invisibile in un luogo conosciuto o ovvio entro gittata, e attraverso di esso vedi o senti.'],tip:'Serve un focus da 100 mo che Kaean non ha.'},
+  cibo:{s:'Evocazione',ct:'Azione',rg:'9 m',cp:'V, S',du:'Istantanea',
+    full:['Crei cibo e acqua sufficienti per 15 umanoidi o 5 cavalcature per 24 ore. Il cibo si guasta dopo un giorno.'],tip:'Il cibo è insipido, ma sempre meglio di quello barovano. Anche Kaean deve ammetterlo.'},
+  morteapp:{s:'Necromanzia',ct:'Azione (o rituale +10 minuti)',rg:'Contatto',cp:'V, S, M (un pizzico di terra di cimitero)',du:'1 ora',
+    full:['Una creatura consenziente sembra morta a qualsiasi esame.','È Accecata e Incapacitata, ha velocità 0 e resistenza a tutti i danni tranne psichici.'],tip:'Utile per fingere una morte o sfuggire a un nemico.'},
+  glifo:{s:'Abiurazione',ct:'1 ora',rg:'Contatto',cp:'V, S, M (polvere di diamante da 200 mo, consumata)',du:'Finché non viene dissolto o attivato',
+    full:['Iscrivi un glifo su una superficie o un oggetto chiuso, con una condizione di attivazione.','Può essere una runa esplosiva (5d8 danni in una sfera di 6 m, TS Destrezza) o contenere un incantesimo di 3° livello o inferiore.'],tip:'Troppo costoso per ora.'},
+  cerchio:{s:'Abiurazione',ct:'1 minuto',rg:'3 m',cp:'V, S, M (sale e polvere d\'argento da 100 mo, consumati)',du:'1 ora',
+    full:['Crei un cilindro di 3 m di raggio. Scegli uno o più tipi tra celestiali, elementali, folletti, immondi e non morti.','Quelle creature non possono entrare con mezzi non magici, hanno svantaggio agli attacchi contro chi è dentro e non possono affascinarlo, spaventarlo o possederlo.','Puoi invertirlo per intrappolare una creatura all\'interno.'],tip:'Un rifugio sicuro contro i vampiri per riposare. Costa 100 mo a lancio.'},
+  fondersi:{s:'Trasmutazione',ct:'Azione (o rituale +10 minuti)',rg:'Contatto',cp:'V, S',du:'8 ore',
+    full:['Entri in un oggetto o una superficie di pietra abbastanza grande da contenerti e ci resti fino a 8 ore.'],tip:'Un nascondiglio d\'emergenza per sfuggire a un inseguimento.'},
+  protenergia:{s:'Abiurazione',ct:'Azione',rg:'Contatto',cp:'V, S',du:'Concentrazione, fino a 1 ora',
+    full:['La creatura che tocchi ha resistenza a un tipo di danno a scelta tra acido, freddo, fuoco, fulmine e tuono.'],tip:'Contro un drago o un incantatore che usa il fuoco.'},
+  inviare:{s:'Divinazione',ct:'Azione',rg:'Illimitata',cp:'V, S, M (un filo di rame)',du:'1 round',
+    full:['Mandi un messaggio di 25 parole al massimo a una creatura che conosci. Ti riconosce e può rispondere subito.','Barovia conta come un piano separato: un messaggio verso l\'esterno può non arrivare.'],tip:'Per tenersi in contatto con chi si è separato dal gruppo dentro Barovia.'},
+  parlamorti:{s:'Necromanzia',ct:'Azione',rg:'3 m',cp:'V, S, M (incenso acceso)',du:'10 minuti',
+    full:['Un cadavere con la bocca risponde fino a 5 domande, con ciò che sapeva da vivo.','Non funziona sui non morti, e sullo stesso corpo una sola volta ogni 10 giorni.'],tip:'Utile per indagare sulle vittime di Barovia.'},
+  linguaggi:{s:'Divinazione',ct:'Azione',rg:'Contatto',cp:'V, M (una piccola ziggurat d\'argilla)',du:'1 ora',
+    full:['La creatura che tocchi capisce ogni lingua parlata o segnata, e chiunque la sente la capisce.'],tip:'Kaean conosce solo il Comune: utile con chi parla altre lingue.'},
+  camminare:{s:'Trasmutazione',ct:'Azione (o rituale +10 minuti)',rg:'9 m',cp:'V, S, M (un pezzo di sughero)',du:'1 ora',
+    full:['Fino a 10 creature possono camminare su acqua, fango, neve o altri liquidi come su terreno solido.'],tip:'Per attraversare fiumi e laghi.'}
+});
+
+const DEFAULT_PREP = ['parola','sant','comando','pbm','indmag','preghiera','silenzio','guardiani','luce','dissolvi'];
+const PREP_MAX = 10;
+const isPrep = sp => (sp.l === 0 && !sp.x) || sp.dom || (S.prep || DEFAULT_PREP).includes(sp.id);
 const INIT_ITEMS = [
   ['Armatura completa di mithral',1,'CA 18 • oggetto non comune • indossata'],
   ['Scudo della casata',1,'+2 CA • simbolo di Ilmater come emblema'],
@@ -908,7 +1043,7 @@ const POTIONS = {'Pozione media di guarigione':'4d4+4','Pozione piccola di guari
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 const fresh = () => ({
-  v:4, updatedAt:0,
+  v:5, updatedAt:0, prep:DEFAULT_PREP.slice(),
   hp:{cur:BASE_HP,temp:0,aid:0,drain:0},
   hd:0, death:{s:0,f:0}, slots:{1:0,2:0,3:0}, cd:0,
   conc:'', conds:[], exh:0, insp:0,
@@ -927,14 +1062,16 @@ let pendingConfirm = null, confirmTimer = null;
 let db = null, docRef = null, syncState = 'local', saving = false, saveAgain = false, saveTimer = null;
 
 function migrate(st){
-  if ((st.v || 1) >= 4) return false;
-  if ((st.v || 1) >= 3){ migrateV4(st); return true; }
+  if ((st.v || 1) >= 5){ if (!Array.isArray(st.prep)) { st.prep = DEFAULT_PREP.slice(); return true; } return false; }
+  if ((st.v || 1) >= 4){ st.prep = DEFAULT_PREP.slice(); st.v = 5; return true; }
+  if ((st.v || 1) >= 3){ migrateV4(st); st.prep = DEFAULT_PREP.slice(); st.v = 5; return true; }
   if ((st.v || 1) < 2) migrateV2(st);
   const sell = (name, gp) => { const i = st.items.findIndex(x => x.n === name); if (i >= 0){ st.items.splice(i, 1); st.coins.mo = (st.coins.mo || 0) + gp; } };
   sell('Camicia di maglia', 25); sell('Mazza', 1);
   const hw = st.items.find(x => /acqua santa/i.test(x.n));
   if (hw){ hw.q += 2; hw.note = '1 dalla dotazione + 2 comprate • componente di Protezione dal Bene e dal Male'; st.coins.mo = Math.max(0, (st.coins.mo || 0) - 50); }
   migrateV4(st);
+  st.prep = DEFAULT_PREP.slice(); st.v = 5;
   return true;
 }
 function migrateV4(st){
@@ -1262,6 +1399,23 @@ function renderSheet(){
   </div>`;
 }
 
+function grimoire(){
+  const prep = S.prep || DEFAULT_PREP;
+  const n = prep.length;
+  const row = sp => {
+    let st;
+    if (sp.l === 0) st = sp.x ? '<span class="muted">si sceglie salendo di livello</span>' : '<span class="tag gold">conosciuto</span>';
+    else if (sp.dom) st = '<span class="tag gold">dominio</span>';
+    else { const on = prep.includes(sp.id); st = `<button class="btn sm${on ? ' primary' : ''}" data-a="prep" data-id="${sp.id}" ${!on && n >= PREP_MAX ? 'disabled' : ''}>${on ? 'Preparato ✓' : 'Prepara'}</button>`; }
+    return `<div class="grow"><span class="gn"><b>${sp.n}</b>${sp.c?'<span class="badge">conc.</span>':''}${sp.r?'<span class="badge">rituale</span>':''}<br><span class="muted">${esc(sp.d)}</span></span><span class="gs">${st}</span><button class="info" data-a="info" data-id="${sp.id}" aria-label="Dettagli di ${sp.n}">i</button></div>`;
+  };
+  const lv = [[0,'Trucchetti'],[1,'1° livello'],[2,'2° livello'],[3,'3° livello']];
+  return `<div class="panel span2" id="grimoire">
+    <h2>Grimorio del chierico <small>Preparati ${n}/${PREP_MAX} • si cambiano dopo un riposo lungo</small></h2>
+    <p class="muted">Tutti gli incantesimi da chierico fino al 3° livello. Quelli del dominio sono sempre preparati e non contano nei ${PREP_MAX}. I trucchetti da gnomo (Riparare, Prestidigitazione) sono fissi.</p>
+    ${lv.map(([L,t]) => `<h3>${t}</h3><div class="glist">${SPELLS.filter(s => s.l === L && !['ripar','presti'].includes(s.id)).sort((a,b) => a.n.localeCompare(b.n, 'it')).map(row).join('')}</div>`).join('')}
+  </div>`;
+}
 function renderSpells(){
   const slotsLeft = L => SLOT_MAX[L] - S.slots[L];
   const groups = [[0,'Trucchetti'],[1,'1° livello'],[2,'2° livello'],[3,'3° livello']];
@@ -1301,7 +1455,8 @@ function renderSpells(){
       <div class="slots">${[1,2,3].map(L=>`<div class="slot"><strong>${L}° livello</strong><div class="pips" style="margin-top:6px">${Array.from({length:SLOT_MAX[L]},(_,i)=>`<button class="pip ${i<slotsLeft(L)?'on':''}" data-a="slotpip" data-l="${L}" data-i="${i}" aria-label="Slot ${L}° ${i+1}"></button>`).join('')}</div></div>`).join('')}
       <div class="slot"><strong>Concentrazione</strong><div class="muted" style="margin-top:6px">${S.conc?esc(S.conc):'Nessuna'}</div>${S.conc?'<button class="btn sm" style="margin-top:6px" data-a="concend">Termina</button>':''}</div></div>
     </div>
-    ${groups.map(([L,t])=>`<div class="panel"><h2>${t}</h2>${SPELLS.filter(s=>s.l===L).map(spellHtml).join('')}</div>`).join('')}`;
+    ${groups.map(([L,t])=>`<div class="panel"><h2>${t}</h2>${SPELLS.filter(s=>s.l===L && isPrep(s)).map(spellHtml).join('')}</div>`).join('')}
+    ${grimoire()}`;
 }
 
 function renderInv(){
@@ -1508,6 +1663,11 @@ document.addEventListener('click', e => {
       document.getElementById('modal').hidden = false;
       document.querySelector('#modal .close').focus();
       break;
+    }
+    case 'prep': {
+      const prep = (S.prep || DEFAULT_PREP).slice(); const k = prep.indexOf(id);
+      if (k >= 0) prep.splice(k, 1); else if (prep.length < PREP_MAX) prep.push(id);
+      S.prep = prep; if (openSpell === id) openSpell = null; commit(); break;
     }
     case 'info': {
       const sp = SPELLS.find(x => x.id === id), d = INFO[id];
