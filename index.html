@@ -1336,7 +1336,7 @@ function renderCombat(){
     <div class="btns" style="padding:6px 0 4px">
       <button class="btn sm" data-a="spark-heal" ${S.cd>=CD_MAX?'disabled':''}>Scintilla: cura</button>
       <button class="btn sm" data-a="spark-dmg" ${S.cd>=CD_MAX?'disabled':''}>Scintilla: danno</button><button class="info" data-a="resinfo" data-id="spark" aria-label="Dettagli: Scintilla Divina">i</button>
-      <button class="btn sm" data-a="turn" ${S.cd>=CD_MAX?'disabled':''}>Scacciare + Bruciare</button><button class="info" data-a="resinfo" data-id="turn" aria-label="Dettagli: Scacciare Non Morti">i</button>
+      <button class="btn sm" data-a="turn" ${S.cd>=CD_MAX?'disabled':''}>Scacciare Non Morti</button><button class="info" data-a="resinfo" data-id="turn" aria-label="Dettagli: Scacciare Non Morti">i</button>
       <button class="btn sm" data-a="preserve" ${S.cd>=CD_MAX?'disabled':''}>Preservare Vita</button><button class="info" data-a="resinfo" data-id="preserve" aria-label="Dettagli: Preservare Vita">i</button>
     </div>
     <div class="resline"><span class="rl">Slot di incantesimo<button class="info" data-a="resinfo" data-id="slots" aria-label="Dettagli: Slot di incantesimo">i</button></span><span class="muted">1°: ${slotsLeft(1)}/4 • 2°: ${slotsLeft(2)}/3 • 3°: ${slotsLeft(3)}/3</span></div>
@@ -1454,6 +1454,15 @@ function renderSpells(){
       <h2>Slot <small>CD ${DC} • attacco ${fmt(SPELL_ATK)} • un solo slot per turno</small></h2>
       <div class="slots">${[1,2,3].map(L=>`<div class="slot"><strong>${L}° livello</strong><div class="pips" style="margin-top:6px">${Array.from({length:SLOT_MAX[L]},(_,i)=>`<button class="pip ${i<slotsLeft(L)?'on':''}" data-a="slotpip" data-l="${L}" data-i="${i}" aria-label="Slot ${L}° ${i+1}"></button>`).join('')}</div></div>`).join('')}
       <div class="slot"><strong>Concentrazione</strong><div class="muted" style="margin-top:6px">${S.conc?esc(S.conc):'Nessuna'}</div>${S.conc?'<button class="btn sm" style="margin-top:6px" data-a="concend">Termina</button>':''}</div></div>
+    </div>
+    <div class="panel span2">
+      <h2>Canalizzare Divinità <small>${CD_MAX - S.cd}/${CD_MAX} usi • 1 si recupera con il riposo breve</small></h2>
+      <div class="btns">
+        <button class="btn sm" data-a="turn" ${S.cd>=CD_MAX?'disabled':''}>Scacciare Non Morti</button><button class="info" data-a="resinfo" data-id="turn" aria-label="Dettagli: Scacciare Non Morti">i</button>
+        <button class="btn sm" data-a="spark-heal" ${S.cd>=CD_MAX?'disabled':''}>Scintilla: cura</button>
+        <button class="btn sm" data-a="spark-dmg" ${S.cd>=CD_MAX?'disabled':''}>Scintilla: danno</button><button class="info" data-a="resinfo" data-id="spark" aria-label="Dettagli: Scintilla Divina">i</button>
+        <button class="btn sm" data-a="preserve" ${S.cd>=CD_MAX?'disabled':''}>Preservare Vita</button><button class="info" data-a="resinfo" data-id="preserve" aria-label="Dettagli: Preservare Vita">i</button>
+      </div>
     </div>
     ${groups.map(([L,t])=>`<div class="panel"><h2>${t}</h2>${SPELLS.filter(s=>s.l===L && isPrep(s)).map(spellHtml).join('')}</div>`).join('')}
     ${grimoire()}`;
@@ -1586,7 +1595,7 @@ document.addEventListener('click', e => {
     case 'cdpip': S.cd = i < CD_MAX - S.cd ? CD_MAX - i : CD_MAX - i - 1; S.cd = Math.max(0, Math.min(CD_MAX, S.cd)); commit(); break;
     case 'spark-heal': if (spendCd()) rollDmg('Scintilla Divina: cura', `1d8+${M.sag}`, {suffix:'PF a una creatura entro 9 m'}); break;
     case 'spark-dmg': if (spendCd()) rollDmg('Scintilla Divina: danno', `1d8+${M.sag}`, {suffix:`radiosi o necrotici • TS Cos CD ${DC}, metà se riesce`}); break;
-    case 'turn': if (spendCd()) rollDmg('Bruciare Non Morti', `${M.sag}d8`, {suffix:`radiosi • Scacciare: TS Sag CD ${DC}, chi fallisce è Spaventato e Incapacitato`}); break;
+    case 'turn': if (spendCd()) rollDmg('Scacciare Non Morti: Bruciare', `${M.sag}d8`, {suffix:`radiosi • Scacciare: TS Sag CD ${DC}, chi fallisce è Spaventato e Incapacitato`}); break;
     case 'preserve': if (spendCd()){ show('Preservare Vita', 30, 'PF da ripartire tra creature Sanguinanti entro 9 m, fino a metà dei loro PF massimi', ''); commit(); } break;
     case 'hd': if (S.hd < HD_MAX){ S.hd += 1; const r = rollExpr(`1d8+${M.cos}`); const v = Math.max(1, r.total); S.hp.cur = Math.min(maxHp(), S.hp.cur + v); show('Dado Vita', v, r.text + ' • curati', ''); commit(); } break;
     case 'insp+': S.insp += 1; commit(); break;
