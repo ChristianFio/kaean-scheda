@@ -1117,7 +1117,7 @@ let tab = 'combat';
 let rollMode = 'norm', useInsp = false;
 let openSpell = null, spellLvl = {}, spellTarget = {};
 let lastCrit = false;
-let pendingConfirm = null, confirmTimer = null;
+let pendingConfirm = null, confirmTimer = null, srCount = 0;
 let db = null, docRef = null, syncState = 'local', saving = false, saveAgain = false, saveTimer = null;
 
 function migrate(st){
@@ -1555,6 +1555,22 @@ function renderLog(){
     return `<li><b>${l.total}</b><span><span>${esc(l.label)}</span><br><span style="opacity:.7">${esc(l.detail)}</span></span><time>${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</time></li>`;
   }).join('') || '<li><span></span><span>Nessun tiro ancora.</span><span></span></li>';
 }
+function renderShortRest(){
+  const avail = HD_MAX - S.hd, mh = maxHp();
+  const avg = Math.round(srCount * (4.5 + M.cos));
+  document.getElementById('modal-body').innerHTML = `
+    <button class="btn sm close" data-a="mclose">Chiudi</button>
+    <h2 id="modal-title">Riposo breve</h2>
+    <p class="muted" style="margin-top:-4px">Almeno 1 ora di riposo • recuperi 1 Canalizzare Divinità</p>
+    <div class="meta"><div><b>PF attuali</b>${S.hp.cur} / ${mh}</div><div><b>Dadi Vita disponibili</b>${avail} / ${HD_MAX} (d8${fmt(M.cos)})</div><div><b>Canalizzare Divinità</b>${CD_MAX - S.cd} / ${CD_MAX}</div></div>
+    <h3>Quanti Dadi Vita vuoi spendere?</h3>
+    <div class="btns">
+      <span class="stepper"><button class="btn" data-a="sr-" aria-label="Uno in meno" ${srCount<=0?'disabled':''}>−</button><b style="font-size:1.6rem;min-width:2ch">${srCount}</b><button class="btn" data-a="sr+" aria-label="Uno in più" ${srCount>=avail?'disabled':''}>+</button></span>
+      <span class="muted">${srCount ? `circa +${avg} PF (${srCount}d8${M.cos ? '+' + srCount * M.cos : ''})` : 'nessun dado: recuperi solo Canalizzare Divinità'}</span>
+    </div>
+    <p class="muted" style="margin-top:8px">I Dadi Vita spesi tornano tutti con il riposo lungo.</p>
+    <div class="btns" style="margin-top:12px"><button class="btn primary" data-a="srgo">Riposa${srCount ? ` e tira ${srCount}d8` : ''}</button></div>`;
+}
 function render(){
   renderHeader();
   document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tab));
@@ -1663,7 +1679,24 @@ document.addEventListener('click', e => {
     case 'exh+': S.exh = Math.min(6, S.exh + 1); commit(); break;
     case 'exh-': S.exh = Math.max(0, S.exh - 1); commit(); break;
     case 'cond': { const c = b.dataset.c; S.conds = S.conds.includes(c) ? S.conds.filter(x => x !== c) : [...S.conds, c]; commit(); break; }
-    case 'short': if (needConfirm('short', b)){ S.cd = Math.max(0, S.cd - 1); show('Riposo breve', '✓', '1 Canalizzare Divinità recuperato • spendi i Dadi Vita dalla scheda Combattimento', ''); commit(); } break;
+    case 'short': {
+      const avail = HD_MAX - S.hd, miss = maxHp() - S.hp.cur;
+      srCount = Math.min(avail, Math.max(0, Math.ceil(miss / (4.5 + M.cos))));
+      renderShortRest(); document.getElementById('modal').hidden = false;
+      break;
+    }
+    case 'sr-': srCount = Math.max(0, srCount - 1); renderShortRest(); break;
+    case 'sr+': srCount = Math.min(HD_MAX - S.hd, srCount + 1); renderShortRest(); break;
+    case 'srgo': {
+      const rolls = []; let tot = 0;
+      for (let k = 0; k < srCount; k++){ const r = rnd(8); rolls.push(r); tot += Math.max(1, r + M.cos); }
+      const before = S.hp.cur;
+      if (srCount){ S.hd += srCount; if (S.hp.cur === 0) S.death = {s:0,f:0}; S.hp.cur = Math.min(maxHp(), S.hp.cur + tot); }
+      const cdBack = S.cd > 0; S.cd = Math.max(0, S.cd - 1);
+      document.getElementById('modal').hidden = true;
+      show('Riposo breve', srCount ? `+${S.hp.cur - before}` : '✓', (srCount ? `${srCount} Dadi Vita: d8 [${rolls.join(', ')}] +${M.cos} ciascuno • ` : 'Nessun Dado Vita speso • ') + (cdBack ? '1 Canalizzare Divinità recuperato' : 'Canalizzare Divinità già al massimo'), '');
+      commit(); break;
+    }
     case 'long': if (needConfirm('long', b)){
         S.hp.drain = 0; S.hp.aid = 0; S.hp.temp = 0; S.hp.cur = maxHp();
         S.hd = 0; S.slots = {1:0,2:0,3:0}; S.cd = 0; S.death = {s:0,f:0}; S.conc = ''; S.concCheck = 0;
