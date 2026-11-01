@@ -302,6 +302,7 @@ textarea{width:100%;min-height:280px;border:1px solid var(--rule);background:#fb
       <button role="tab" data-tab="sheet">Caratteristiche</button>
       <button role="tab" data-tab="spells">Incantesimi</button>
       <button role="tab" data-tab="inv">Zaino</button>
+      <button role="tab" data-tab="guide">Guida</button>
       <button role="tab" data-tab="notes">Note</button>
     </nav>
   </div>
@@ -324,6 +325,61 @@ textarea{width:100%;min-height:280px;border:1px solid var(--rule);background:#fb
         <button class="btn primary" type="submit">Aggiungi</button>
       </form>
       <p class="muted">Regola del master: si comprano solo oggetti magici comuni.</p>
+    </div>
+  </section>
+  <section id="tab-guide" class="grid" role="tabpanel" hidden>
+    <div class="panel span2">
+      <h2>Guida al combattimento <small>Kaean, chierico della Vita 6</small></h2>
+      <p>Kaean è un <b>incantatore in armatura pesante</b>: sta in prima linea con CA 20, fa danni a tutti i nemici vicini con Guardiani Spirituali e rialza chi cade. Non deve curare a ogni turno: deve tenere attivi i Guardiani, fare danni e intervenire solo quando qualcuno è davvero in pericolo.</p>
+    </div>
+    <div class="panel">
+      <h2>Cosa hai in ogni turno</h2>
+      <dl class="kv">
+        <dt>Azione</dt><dd>Un incantesimo, un trucchetto, Canalizzare Divinità o un attacco</dd>
+        <dt>Azione bonus</dt><dd>Parola Guaritrice, Parola Guaritrice di Massa, Santuario, Ristorare Inferiore</dd>
+        <dt>Movimento</dt><dd>9 m, anche spezzato prima e dopo l'azione</dd>
+        <dt>Reazione</dt><dd>Attacco di opportunità o, con Incantatore da Guerra, un trucchetto come Fiamma Sacra al suo posto</dd>
+      </dl>
+      <h3>Due regole da non dimenticare</h3>
+      <p><b>Un solo slot per turno.</b> Se nel turno lanci un incantesimo con uno slot (per esempio Guardiani Spirituali), non puoi lanciare anche Parola Guaritrice con uno slot. I trucchetti e Canalizzare Divinità non contano.</p>
+      <p><b>Una sola concentrazione.</b> Se lanci un altro incantesimo con concentrazione, Guardiani Spirituali finisce. Quando subisci danni fai un TS di Costituzione (+2 con vantaggio) con CD 10 o metà dei danni se è di più: la scheda te lo propone da sola.</p>
+    </div>
+    <div class="panel">
+      <h2>Le tue armi</h2>
+      <dl class="kv">
+        <dt>Guardiani Spirituali</dt><dd>3d8 radiosi a ogni nemico entro 4,5 m, metà se supera il TS. Dimezza la loro velocità. Si muove con te.</dd>
+        <dt>Parola Radiosa</dt><dd>2d6 radiosi a tutti i nemici adiacenti. Il trucchetto da usare quando sei nella mischia.</dd>
+        <dt>Fiamma Sacra</dt><dd>2d8 radiosi a 18 m, ignora la copertura. Il trucchetto a distanza.</dd>
+        <dt>Scacciare + Bruciare</dt><dd>Non morti entro 9 m: 4d8 radiosi e scappano per 1 minuto.</dd>
+        <dt>Parola Guaritrice</dt><dd>Azione bonus a 18 m: 2d4+7. Il modo migliore per rialzare chi è a 0 PF.</dd>
+        <dt>Preservare Vita</dt><dd>30 PF da dividere tra chi è Sanguinante entro 9 m.</dd>
+      </dl>
+    </div>
+    <div class="panel span2">
+      <h2>La sequenza da fare quasi sempre</h2>
+      <h3>Prima dello scontro</h3>
+      <p>• Al mattino: <b>Aiuto</b> su Kaean, sul tuo signore e su un altro compagno (+5 PF massimi per 8 ore).<br>• Prima di un covo di vampiri: <b>Luce Diurna</b> su un sasso, tenuto in un sacchetto e tirato fuori quando servono 18 m di sole.<br>• Prima di una prova importante: <b>Guida</b> sul compagno che la tenta.</p>
+      <h3>Turno 1</h3>
+      <p>• <b>Azione: Guardiani Spirituali.</b><br>• <b>Movimento: avanza verso i nemici.</b> Quando l'aura li raggiunge subiscono subito i danni.<br>• Eccezione: se arriva un gruppo di non morti e i Guardiani non sono ancora attivi, apri con <b>Scacciare Non Morti</b> (4d8 a tutti), poi attiva i Guardiani al turno dopo.</p>
+      <h3>Dal turno 2 in poi</h3>
+      <p>• <b>Azione:</b> Parola Radiosa se hai almeno un nemico adiacente, altrimenti Fiamma Sacra sul bersaglio più pericoloso.<br>• <b>Movimento:</b> resta in mezzo ai nemici e vicino al tuo signore: i Guardiani lo proteggono, e lui resta entro 9 m per Preservare Vita.<br>• <b>Azione bonus:</b> Parola Guaritrice solo se qualcuno è a 0 PF.</p>
+    </div>
+    <div class="panel span2">
+      <h2>Se succede... fai così</h2>
+      <dl class="kv">
+        <dt>Un compagno va a 0 PF</dt><dd>Parola Guaritrice (azione bonus) e poi il tuo trucchetto con l'azione. Rialzarlo vale più di curare chi è ancora in piedi.</dd>
+        <dt>Due o tre compagni Sanguinanti</dt><dd>Preservare Vita (30 PF) oppure Parola Guaritrice di Massa (fino a 6, 2d4+9 ciascuno).</dd>
+        <dt>Il tuo signore è nel mirino</dt><dd>Santuario su di lui (azione bonus): chi vuole colpirlo deve superare un TS di Saggezza CD 15.</dd>
+        <dt>Arriva un vampiro</dt><dd>Protezione dal Bene e dal Male su chi è più esposto (niente charme, attacchi con svantaggio) e Luce Diurna se ce l'hai.</dd>
+        <dt>Un incantatore nemico</dt><dd>Comando "Fermo" o Silenzio centrato su di lui.</dd>
+        <dt>Kaean è a pochi PF</dt><dd>Santuario su te stesso e ritirati di qualche metro. Guaritore Benedetto ti cura ogni volta che curi un altro.</dd>
+        <dt>Uno senza slot</dt><dd>Scintilla Divina: 1d8+4 di cura o di danno, senza spendere slot.</dd>
+        <dt>Fine combattimento</dt><dd>Preghiera di Guarigione (10 minuti) vale come riposo breve per 5 persone e ti ridà 1 Canalizzare Divinità.</dd>
+      </dl>
+    </div>
+    <div class="panel span2">
+      <h2>Errori da evitare</h2>
+      <p>• <b>Curare "a gocce"</b> chi è ancora in piedi: meglio far danni e rialzare chi cade.<br>• <b>Lanciare un'altra concentrazione</b> (Benedizione, Silenzio, Protezione dal Bene e dal Male) mentre hai i Guardiani: li perdi.<br>• <b>Usare Cura Ferite in combattimento</b>: costa l'azione. Tienila per dopo lo scontro o per un'emergenza.<br>• <b>Colpire i non morti scacciati</b> con i Guardiani: i danni rompono l'effetto e tornano all'attacco.<br>• <b>Restare troppo lontano</b>: Parola Guaritrice arriva a 18 m, Preservare Vita solo a 9 m.</p>
     </div>
   </section>
   <section id="tab-notes" class="grid" role="tabpanel" hidden>
@@ -1498,7 +1554,7 @@ function renderLog(){
 function render(){
   renderHeader();
   document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tab));
-  ['combat','sheet','spells','inv','notes'].forEach(t => document.getElementById('tab-' + t).hidden = t !== tab);
+  ['combat','sheet','spells','inv','guide','notes'].forEach(t => document.getElementById('tab-' + t).hidden = t !== tab);
   if (tab === 'combat') renderCombat();
   if (tab === 'sheet') renderSheet();
   if (tab === 'spells') renderSpells();
