@@ -332,6 +332,11 @@ details.fold[open] > summary{margin-bottom:12px}
 .seals{gap:8px}
 @media (max-width:359px){.slot{width:38px;height:38px}}
 
+.turnguide dl.kv{display:block;margin:0}
+.turnguide dl.kv dt{margin:10px 0 0;padding:0;border:0;font-weight:700;color:var(--ink)}
+.turnguide dl.kv dt:first-child{margin-top:0}
+.turnguide dl.kv dd{margin:2px 0 0;padding:0 0 10px;border:0;border-bottom:1px solid rgba(122,90,54,.25)}
+.turnguide dl.kv dd:last-child{border-bottom:0;padding-bottom:0}
 /* Wide screens: one bar on top, cards in columns */
 @media (min-width:900px){
   body{padding-bottom:48px}
@@ -1511,11 +1516,24 @@ function slotPanel(){
     <div class="resline"><div class="rl"><b>Concentrazione</b><div class="muted">${S.conc ? esc(S.conc) : 'Nessuna'}</div></div>${S.conc ? '<button class="btn sm" data-a="concend">Termina</button>' : ''}</div>
   </div>`;
 }
+const TURN_GUIDE = [
+  ['Prima dello scontro', 'Al mattino: Aiuto su di te e su due compagni (+5 PF massimi per 8 ore).'],
+  ['Turno 1', 'Azione: Guardiani Spirituali, poi avanza verso i nemici. Se arriva un gruppo di non morti, apri con Scacciare Non Morti.'],
+  ['Turni successivi', 'Azione: Parola Radiosa se hai un nemico adiacente, altrimenti Fiamma Sacra. Resta vicino ai nemici e al tuo signore.'],
+  ['Un compagno a 0 PF', 'Azione bonus: Parola Guaritrice, poi il trucchetto con l\'azione.'],
+  ['Più compagni Sanguinanti', 'Preservare Vita (30 PF da dividere) oppure Parola Guaritrice di Massa.'],
+  ['Il tuo signore nel mirino', 'Azione bonus: Santuario su di lui.'],
+  ['Senza slot', 'Scintilla Divina: cura o danno senza spendere slot.'],
+  ['Regole', 'Un solo slot per turno. Una sola concentrazione: un nuovo incantesimo con concentrazione fa finire i Guardiani. Quando subisci danni fai il TS di concentrazione, con vantaggio.']
+];
+let guideOpen = (() => { try { return localStorage.getItem('kaean-sheet-v1:turnguide') === '1'; } catch (e) { return false; } })();
+document.addEventListener('toggle', e => { if (e.target.id === 'turnguide'){ guideOpen = e.target.open; try { localStorage.setItem('kaean-sheet-v1:turnguide', guideOpen ? '1' : '0'); } catch (x) {} } }, true);
 function renderCombat(){
   const down = S.hp.cur === 0;
   const pots = S.items.filter(it => POTIONS[it.n] && it.q > 0);
   const sg = S.conc === 'Guardiani Spirituali';
   document.getElementById('tab-combat').innerHTML = `
+  <details class="panel fold span2 turnguide" id="turnguide"${guideOpen ? ' open' : ''}><summary><h2>Il tuo turno</h2></summary><dl class="kv">${TURN_GUIDE.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></details>
   ${down ? `<div class="panel">
     <h2>A terra <small>0 punti ferita</small></h2>
     <p>A inizio turno tiri contro la morte: 10 o più è un successo, 20 ti rialza con 1 PF, 1 vale due fallimenti.</p>
