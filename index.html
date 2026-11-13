@@ -469,7 +469,7 @@ details.fold[open] > summary{margin-bottom:12px}
   <section id="tab-guide" class="grid" hidden>
     <details class="panel fold span2" open>
       <summary><h2>Guida al combattimento</h2></summary>
-      <p>Kaean è un <b>incantatore in armatura pesante</b>: sta in prima linea con CA 20, fa danni a tutti i nemici vicini con Guardiani Spirituali e rialza chi cade. Non deve curare a ogni turno: deve tenere attivi i Guardiani, fare danni e intervenire solo quando qualcuno è davvero in pericolo.</p>
+      <p>Kaean è un <b>incantatore in armatura pesante</b>: sta in prima linea con CA 21, fa danni a tutti i nemici vicini con Guardiani Spirituali e rialza chi cade. Non deve curare a ogni turno: deve tenere attivi i Guardiani, fare danni e intervenire solo quando qualcuno è davvero in pericolo.</p>
     </details>
     <details class="panel fold" open>
       <summary><h2>Cosa hai in ogni turno</h2></summary>
@@ -511,7 +511,7 @@ details.fold[open] > summary{margin-bottom:12px}
         <dt>Il tuo signore è nel mirino</dt><dd>Santuario su di lui (azione bonus): chi vuole colpirlo deve superare un TS di Saggezza CD 15.</dd>
         <dt>Arriva un vampiro</dt><dd>Protezione dal Bene e dal Male su chi è più esposto (niente charme, attacchi con svantaggio) e Luce Diurna se ce l'hai.</dd>
         <dt>Un incantatore nemico</dt><dd>Comando "Fermo" o Silenzio centrato su di lui.</dd>
-        <dt>Kaean è a pochi PF</dt><dd>Santuario su te stesso e ritirati di qualche metro. Guaritore Benedetto ti cura ogni volta che curi un altro.</dd>
+        <dt>Kaean è a pochi PF</dt><dd>Cura Arborea dello scudo (azione bonus, 3d10, una volta al giorno), oppure Santuario su te stesso e ritirati di qualche metro. Guaritore Benedetto ti cura ogni volta che curi un altro.</dd>
         <dt>Uno senza slot</dt><dd>Scintilla Divina: 1d8+4 di cura o di danno, senza spendere slot.</dd>
         <dt>Fine combattimento</dt><dd>Preghiera di Guarigione (10 minuti) vale come riposo breve per 5 persone e ti ridà 1 Canalizzare Divinità.</dd>
       </dl>
@@ -985,7 +985,10 @@ const INFO = {
 const ITEM_INFO = {
   'Armatura completa di mithral':{t:'Armatura pesante • oggetto magico non comune (nessuna sintonia)',w:'65 lb',v:'—',p:'CA 18 (la Destrezza non conta)',
     full:['Armatura a piastre completa forgiata in mithral, un metallo leggero e flessibile.','Una normale armatura completa richiede Forza 15 (altrimenti −3 m di velocità) e dà svantaggio alle prove di Destrezza (Furtività): la versione di mithral elimina entrambi i difetti.','Indossarla richiede 10 minuti, toglierla 5 minuti.'],
-    tip:'È l\'oggetto non comune scelto con le regole del master. Insieme allo scudo dà CA 20 con velocità piena di 9 m.'},
+    tip:'È l\'oggetto non comune scelto con le regole del master. Insieme allo Scudo dell\'Albero della Vita dà CA 21 con velocità piena di 9 m.'},
+  'Scudo dell\'Albero della Vita':{t:'Scudo +1 • oggetto magico evolutivo (richiede sintonia)',w:'6 lb',v:'—',p:'+3 CA (+2 dello scudo, +1 magico)',
+    full:['Uno scudo d\'argento con un albero della vita scolpito in rilievo: le radici scendono fino al bordo e la chioma sembra brina cristallizzata.','Richiede sintonia. Mentre lo impugni hai +1 alla CA oltre al normale +2 dello scudo.','Cura Arborea: una volta al giorno, con un\'azione bonus, recuperi 3d10 punti ferita. Cura solo chi impugna lo scudo.','Oggetto evolutivo: diventa più potente insieme al suo proprietario.'],
+    tip:'Cura Arborea è un\'azione bonus: nello stesso turno puoi usare l\'azione per Guardiani Spirituali o un trucchetto. Non è un incantesimo, quindi non usa slot e Discepolo della Vita non la potenzia.'},
   'Scudo della casata':{t:'Scudo',w:'6 lb',v:'10 mo',p:'+2 CA',
     full:['Il vecchio scudo dell\'armeria della casata, staccato dalla parete la notte della partenza.','Sopra è dipinto l\'emblema di Ilmater, due mani legate ai polsi da un cordone rosso: funziona da simbolo sacro, quindi è il focus per gli incantesimi.','Si imbraccia o si toglie con un\'azione.'],
     tip:'Con Incantatore da Guerra puoi lanciare incantesimi con componenti somatiche anche con arma e scudo in mano.'},
@@ -1044,6 +1047,9 @@ const SKILL_INFO = {
 };
 
 const RES_INFO = {
+  arborea:{n:'Cura Arborea',t:'Scudo dell\'Albero della Vita',meta:[['Tempo','Azione bonus'],['Usi','1 al giorno'],['Effetto','Recuperi 3d10 PF']],
+    full:['Il potere dello scudo: con un\'azione bonus recuperi 3d10 punti ferita.','Cura solo chi impugna lo scudo, non gli alleati. Una volta al giorno: la scheda la rende di nuovo disponibile con il riposo lungo.'],
+    tip:'Non è un incantesimo: non usa slot e conta come la tua azione bonus del turno.'},
   cd:{n:'Canalizzare Divinità',t:'Privilegio del chierico',meta:[['Usi','3 (livello 6)'],['Recupero','1 con riposo breve, tutti con riposo lungo'],['CD dei TS',String(DC)]],
     full:['Incanali l\'energia divina di Ilmater per creare un effetto magico. Ogni uso ti fa scegliere uno di questi effetti: Scintilla Divina, Scacciare Non Morti (con Bruciare Non Morti) o Preservare Vita.','Gli usi crescono con il livello: 2 dal livello 2, 3 dal livello 6, 4 dal livello 18.','Un uso è sempre un\'azione magica: nello stesso turno puoi ancora usare l\'azione bonus, per esempio per Parola Guaritrice.'],
     tip:'Con 3 usi e un riposo breve in mezzo puoi arrivare a 4 utilizzi al giorno. Tieni sempre un uso per Scacciare Non Morti.'},
@@ -1204,7 +1210,8 @@ const PREP_MAX = 10;
 const isPrep = sp => (sp.l === 0 && !sp.x) || sp.dom || (S.prep || DEFAULT_PREP).includes(sp.id);
 const INIT_ITEMS = [
   ['Armatura completa di mithral',1,'CA 18 • oggetto non comune • indossata'],
-  ['Scudo della casata',1,'+2 CA • simbolo di Ilmater come emblema'],
+  ['Scudo dell\'Albero della Vita',1,'+1 • sintonia • Cura Arborea 3d10 una volta al giorno • impugnato'],
+  ['Scudo della casata',1,'+2 CA • simbolo di Ilmater come emblema • nello zaino'],
   ['Martello da guerra',1,'1d8 contundenti, versatile 1d10'],
   ['Dotazione da sacerdote',1,'Zaino, coperta, lampada, razioni per 7 giorni, veste, acciarino'],
   ['Acqua santa',3,'1 dalla dotazione + 2 comprate • componente di Protezione dal Bene e dal Male'],
@@ -1218,9 +1225,9 @@ const POTIONS = {'Pozione media di guarigione':'4d4+4','Pozione piccola di guari
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 const fresh = () => ({
-  v:5, updatedAt:0, prep:DEFAULT_PREP.slice(),
+  v:6, updatedAt:0, prep:DEFAULT_PREP.slice(),
   hp:{cur:BASE_HP,temp:0,aid:0,drain:0},
-  hd:0, death:{s:0,f:0}, slots:{1:0,2:0,3:0}, cd:0,
+  hd:0, death:{s:0,f:0}, slots:{1:0,2:0,3:0}, cd:0, arborea:0,
   conc:'', conds:[], exh:0, insp:0,
   coins:{mr:0,ma:0,me:0,mo:13,mp:0},
   items:INIT_ITEMS.map(([n,q,note]) => ({id:uid(),n,q,note})),
@@ -1228,7 +1235,7 @@ const fresh = () => ({
 });
 
 let S = load();
-const AC = 20, SPEED = '9 m', PASSIVE = 17;
+const AC = 21, SPEED = '9 m', PASSIVE = 17;
 const TABS = {combat:['combat'], spells:['spells','grim'], sheet:['sheet','feat','inv'], diary:['notes','guide','story']};
 const SUB_LBL = {spells:'Preparati', grim:'Grimorio', sheet:'Prove', feat:'Privilegi', inv:'Zaino', notes:'Note', guide:'Guida', story:'Storia'};
 let tab = 'combat', sub = {spells:'spells', sheet:'sheet', diary:'notes'};
@@ -1242,17 +1249,28 @@ const cur = () => TABS[tab].length > 1 ? sub[tab] : TABS[tab][0];
 const slotsLeft = L => SLOT_MAX[L] - S.slots[L];
 
 function migrate(st){
-  if ((st.v || 1) >= 5){ if (!Array.isArray(st.prep)) { st.prep = DEFAULT_PREP.slice(); return true; } return false; }
-  if ((st.v || 1) >= 4){ st.prep = DEFAULT_PREP.slice(); st.v = 5; return true; }
-  if ((st.v || 1) >= 3){ migrateV4(st); st.prep = DEFAULT_PREP.slice(); st.v = 5; return true; }
+  if ((st.v || 1) >= 6){ if (!Array.isArray(st.prep)) { st.prep = DEFAULT_PREP.slice(); return true; } return false; }
+  if ((st.v || 1) >= 5){ migrateV6(st); if (!Array.isArray(st.prep)) st.prep = DEFAULT_PREP.slice(); return true; }
+  if ((st.v || 1) >= 4){ st.prep = DEFAULT_PREP.slice(); migrateV6(st); return true; }
+  if ((st.v || 1) >= 3){ migrateV4(st); st.prep = DEFAULT_PREP.slice(); migrateV6(st); return true; }
   if ((st.v || 1) < 2) migrateV2(st);
   const sell = (name, gp) => { const i = st.items.findIndex(x => x.n === name); if (i >= 0){ st.items.splice(i, 1); st.coins.mo = (st.coins.mo || 0) + gp; } };
   sell('Camicia di maglia', 25); sell('Mazza', 1);
   const hw = st.items.find(x => /acqua santa/i.test(x.n));
   if (hw){ hw.q += 2; hw.note = '1 dalla dotazione + 2 comprate • componente di Protezione dal Bene e dal Male'; st.coins.mo = Math.max(0, (st.coins.mo || 0) - 50); }
   migrateV4(st);
-  st.prep = DEFAULT_PREP.slice(); st.v = 5;
+  st.prep = DEFAULT_PREP.slice(); migrateV6(st);
   return true;
+}
+function migrateV6(st){
+  if (!Array.isArray(st.items)) st.items = [];
+  if (!st.items.some(x => x.n === 'Scudo dell\'Albero della Vita')){
+    const old = st.items.findIndex(x => x.n === 'Scudo della casata');
+    st.items.splice(old >= 0 ? old : 1, 0, {id:uid(), n:'Scudo dell\'Albero della Vita', q:1, note:'+1 • sintonia • Cura Arborea 3d10 una volta al giorno • impugnato'});
+    if (old >= 0) st.items[old + 1].note = '+2 CA • simbolo di Ilmater come emblema • nello zaino';
+  }
+  if (typeof st.arborea !== 'number') st.arborea = 0;
+  st.v = 6;
 }
 function migrateV4(st){
   const sh = st.items.find(x => x.n === 'Scudo di Garrik');
@@ -1523,6 +1541,7 @@ const TURN_GUIDE = [
   ['Un compagno a 0 PF', 'Azione bonus: Parola Guaritrice, poi il trucchetto con l\'azione.'],
   ['Più compagni Sanguinanti', 'Preservare Vita (30 PF da dividere) oppure Parola Guaritrice di Massa.'],
   ['Il tuo signore nel mirino', 'Azione bonus: Santuario su di lui.'],
+  ['Kaean a pochi PF', 'Azione bonus: Cura Arborea dello scudo (3d10), una volta al giorno.'],
   ['Senza slot', 'Scintilla Divina: cura o danno senza spendere slot.'],
   ['Regole', 'Un solo slot per turno. Una sola concentrazione: un nuovo incantesimo con concentrazione fa finire i Guardiani. Quando subisci danni fai il TS di concentrazione, con vantaggio.']
 ];
@@ -1568,6 +1587,7 @@ function renderCombat(){
   <div class="panel">
     <h2>Cure e risorse</h2>
     ${pots.map(it => `<div class="resline"><div class="rl"><b>${esc(it.n)}</b><div class="muted">Azione bonus, ne hai ${it.q}</div></div><button class="btn sm heal" data-a="drink" data-id="${it.id}">Bevi ${POTIONS[it.n]}</button></div>`).join('')}
+    <div class="resline"><div class="rl"><div class="rt"><b>Cura Arborea</b>${rinfo('arborea')}</div><div class="muted">${S.arborea ? 'Usata, torna con il riposo lungo' : 'Azione bonus, una volta al giorno'}</div></div><button class="btn sm heal" data-a="arborea"${S.arborea ? ' disabled' : ''}>Cura 3d10</button></div>
     <div class="resline"><div class="rl"><div class="rt"><b>Dadi Vita</b>${rinfo('hd')}</div><div class="muted">${HD_MAX - S.hd} su ${HD_MAX}</div></div><button class="btn sm" data-a="hd"${S.hd >= HD_MAX ? ' disabled' : ''}>Spendi 1d8+${M.cos}</button></div>
     <div class="resline"><div class="rl"><div class="rt"><b>Ispirazione del master</b>${rinfo('insp')}</div><div class="muted">Si usa dai Dadi</div></div><div class="stepper"><button class="btn sm" data-a="insp-" aria-label="Togli un'ispirazione">−</button><b id="insp-c">${S.insp}</b><button class="btn sm" data-a="insp+" aria-label="Aggiungi un'ispirazione">+</button></div></div>
     <div class="resline"><div class="rl"><b>Riposo</b><div class="muted">Breve o lungo</div></div><button class="btn sm" data-a="restopen">Riposa</button></div>
@@ -1932,10 +1952,10 @@ document.addEventListener('click', e => {
     }
     case 'long':
       S.hp.drain = 0; S.hp.aid = 0; S.hp.temp = 0; S.hp.cur = maxHp();
-      S.hd = 0; S.slots = {1:0,2:0,3:0}; S.cd = 0; S.death = {s:0,f:0}; S.conc = ''; S.concCheck = 0;
+      S.hd = 0; S.slots = {1:0,2:0,3:0}; S.cd = 0; S.arborea = 0; S.death = {s:0,f:0}; S.conc = ''; S.concCheck = 0;
       S.exh = Math.max(0, S.exh - 1);
       closeSheet();
-      show('Riposo lungo', '✓', 'PF, slot, Canalizzare Divinità e Dadi Vita ripristinati • −1 indebolimento • Aiuto terminato', '');
+      show('Riposo lungo', '✓', 'PF, slot, Canalizzare Divinità, Cura Arborea e Dadi Vita ripristinati • −1 indebolimento • Aiuto terminato', '');
       commit(); break;
     case 'slotpip': { const L = +b.dataset.l, left = SLOT_MAX[L] - S.slots[L]; S.slots[L] = i < left ? SLOT_MAX[L] - i : SLOT_MAX[L] - i - 1; S.slots[L] = Math.max(0, Math.min(SLOT_MAX[L], S.slots[L])); commit(); break; }
     case 'spopen': openSpell = openSpell === id ? null : id; render(); break;
@@ -1943,6 +1963,14 @@ document.addEventListener('click', e => {
     case 'sptgt': spellTarget[id] = b.dataset.v; render(); break;
     case 'cast': castSpell(SPELLS.find(s => s.id === id), +b.dataset.v); break;
     case 'ritual': { const sp = SPELLS.find(s => s.id === id); if (sp.c) setConc(sp.n); show(`${sp.n} (rituale)`, '✓', 'Nessuno slot speso • tempo di lancio +10 minuti', ''); commit(); break; }
+    case 'arborea': {
+      if (S.arborea) break;
+      S.arborea = 1;
+      const r = rollExpr('3d10');
+      if (S.hp.cur === 0) S.death = {s:0,f:0};
+      S.hp.cur = Math.min(maxHp(), S.hp.cur + r.total);
+      show('Cura Arborea', r.total, r.text + ` • azione bonus • PF ${S.hp.cur}/${maxHp()}`, ''); commit(); break;
+    }
     case 'drink': {
       const it = S.items.find(x => x.id === id); if (!it || it.q <= 0) break;
       it.q -= 1;
