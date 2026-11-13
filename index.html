@@ -350,6 +350,26 @@ ol.notes{list-style:none;margin:0;padding:0;counter-reset:nt}
 .note.editing textarea{width:100%;min-height:96px;margin-bottom:6px}
 .noempty{padding:8px 0}
 .noempty::before{content:none}
+.turnbox h2{margin-bottom:10px}
+.econ{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pill{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:58px;padding:6px 4px;border:1.5px solid var(--ivy);border-radius:8px;background:rgba(63,93,58,.1);color:var(--ink);text-align:center;line-height:1.15}
+.pill b{font-size:.86rem}
+.pill span{font-size:.76rem;color:var(--ink-2);overflow-wrap:anywhere}
+.pill.used{border-color:var(--rule);background:rgba(0,0,0,.06);opacity:.7}
+.pill.used b{text-decoration:line-through;text-decoration-color:var(--wax)}
+.turnline{margin:10px 0}
+.tsum{margin:0 0 6px}
+.tsec{margin:14px 0 0;padding-top:10px;border-top:1px solid rgba(122,90,54,.3)}
+.tsec h3{margin:0 0 2px}
+.tsec.done{opacity:.75}
+.topt{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dotted rgba(122,90,54,.35)}
+.topt:last-of-type{border-bottom:0}
+.topt .rl{flex:1;min-width:0}
+.topt.off .rl{opacity:.6}
+.chips.basic{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.small{font-size:.86rem}
+.linkbtn{border:0;background:none;padding:0;color:var(--wax);text-decoration:underline;font:inherit;cursor:pointer}
+@media (max-width:360px){.econ{grid-template-columns:repeat(2,1fr)}}
 /* Wide screens: one bar on top, cards in columns */
 @media (min-width:900px){
   body{padding-bottom:48px}
@@ -1590,12 +1610,95 @@ const TURN_GUIDE = [
 ];
 let guideOpen = (() => { try { return localStorage.getItem('kaean-sheet-v1:turnguide') === '1'; } catch (e) { return false; } })();
 document.addEventListener('toggle', e => { if (e.target.id === 'turnguide'){ guideOpen = e.target.open; try { localStorage.setItem('kaean-sheet-v1:turnguide', guideOpen ? '1' : '0'); } catch (x) {} } }, true);
+// Turn economy: what is still available this turn, kept on this device only
+const TURN_KEY = 'kaean-sheet-v1:turn', ECON = [['action','Azione'],['bonus','Azione bonus'],['move','Movimento'],['reaction','Reazione']];
+const freshTurn = () => ({action:'', bonus:'', move:'', reaction:'', slot:''});
+let turn = (() => { try { return {...freshTurn(), ...JSON.parse(localStorage.getItem(TURN_KEY) || '{}')}; } catch (e) { return freshTurn(); } })();
+const saveTurn = () => { try { localStorage.setItem(TURN_KEY, JSON.stringify(turn)); } catch (e) {} };
+const econOf = sp => !sp ? null : /^azione bonus/i.test(sp.t) ? 'bonus' : /^reazione/i.test(sp.t) ? 'reaction' : /^azione/i.test(sp.t) ? 'action' : null;
+const anySlot = () => [1,2,3].some(L => slotsLeft(L) > 0);
+const lowSlot = sp => [1,2,3].find(L => L >= sp.l && slotsLeft(L) > 0);
+function costOf(a, b){
+  const sp = b.dataset.id && SPELLS.find(s => s.id === b.dataset.id);
+  switch (a){
+    case 'atk': return {k:b.dataset.econ || 'action', label:'Martello da guerra'};
+    case 'cantrip': case 'concset': return sp && {k:b.dataset.econ || econOf(sp), label:sp.n};
+    case 'cast': return sp && {k:econOf(sp), label:sp.n, slot:true};
+    case 'spark-heal': case 'spark-dmg': return {k:'action', label:'Scintilla Divina'};
+    case 'turn': return {k:'action', label:'Scacciare Non Morti'};
+    case 'preserve': return {k:'action', label:'Preservare Vita'};
+    case 'arborea': return {k:'bonus', label:'Cura Arborea'};
+    case 'drink': return {k:'bonus', label:'Pozione'};
+    case 'turnmark': return {k:b.dataset.k, label:b.dataset.l};
+  }
+  return null;
+}
+function markTurn(c){
+  if (!c || !c.k) return;
+  if (!turn[c.k]) turn[c.k] = c.label || 'usata';
+  if (c.slot && !turn.slot) turn.slot = c.label;
+  saveTurn();
+}
+const turnLeft = () => ECON.filter(([k]) => !turn[k]);
+function turnPanel(){
+  const left = turnLeft();
+  return `<div class="panel span2 turnbox">
+    <h2><span>Questo turno</span><button class="btn sm" data-a="turnnew">Nuovo turno</button></h2>
+    <div class="econ">${ECON.map(([k, n]) => `<button class="pill${turn[k] ? ' used' : ''}" data-a="turntog" data-k="${k}" aria-pressed="${turn[k] ? 'true' : 'false'}"><b>${n}</b><span>${turn[k] ? esc(turn[k]) : k === 'move' ? SPEED : 'libera'}</span></button>`).join('')}</div>
+    <p class="muted turnline">${left.length ? `Ti restano: <b>${left.map(([, n]) => n.toLowerCase()).join(', ')}</b>.` : 'Hai usato tutto: tocca Nuovo turno quando tocca di nuovo a te.'}${turn.slot ? ` Slot già usato per ${esc(turn.slot)}: niente altri incantesimi con slot.` : anySlot() ? ' Puoi ancora usare uno slot.' : ' Nessuno slot rimasto.'}</p>
+    <button class="btn primary fullrow" data-a="turnopen"${left.length ? '' : ' disabled'}>Cosa posso fare?</button>
+  </div>`;
+}
+function turnOptions(){
+  const o = {action:[], bonus:[], reaction:[]}, slotOk = anySlot() && !turn.slot, cdOk = S.cd < CD_MAX;
+  const add = (k, x) => o[k] && o[k].push(x);
+  const noSlot = () => turn.slot ? 'slot già usato in questo turno' : 'nessuno slot';
+  add('action', {n:'Martello da guerra', sub:`colpire ${fmt(PB + M.for)}, danni ${wdmg('1d8')}`, btn:'data-a="atk"'});
+  SPELLS.filter(sp => isPrep(sp)).forEach(sp => {
+    const k = econOf(sp); if (!k) return;
+    const conc = sp.c && S.conc && S.conc !== sp.n ? ` Fa finire ${S.conc}.` : '';
+    if (sp.l === 0){
+      if (sp.dmg) add(k, {n:sp.n, sub:`${sp.t.replace(/ • /g, ', ')}, danni ${sp.dmg()}`, btn:`data-a="cantrip" data-id="${sp.id}"`});
+      else if (sp.c) add(k, {n:sp.n, sub:'trucchetto, concentrazione.' + conc, btn:`data-a="concset" data-id="${sp.id}"`});
+      return;
+    }
+    const L = lowSlot(sp), active = sp.c && S.conc === sp.n;
+    add(k, {n:sp.n, sub:(L ? `slot di ${L}°, ` : '') + sp.t.replace(/ • /g, ', ') + (active ? '. Già attivo.' : '') + conc, btn:`data-a="cast" data-id="${sp.id}" data-v="${L || sp.l}"`, slot:true, dis:!slotOk || !L, why:!slotOk || !L ? noSlot() : ''});
+  });
+  const cdw = cdOk ? `Canalizzare Divinità, ${CD_MAX - S.cd} su ${CD_MAX}` : 'Canalizzare Divinità finito';
+  add('action', {n:'Scintilla Divina: cura', sub:`1d8${fmt(M.sag)} PF entro 9 m. ${cdw}`, btn:'data-a="spark-heal"', dis:!cdOk, why:'nessun uso'});
+  add('action', {n:'Scintilla Divina: danno', sub:`1d8${fmt(M.sag)}, TS Cos CD ${DC}. ${cdw}`, btn:'data-a="spark-dmg"', dis:!cdOk, why:'nessun uso'});
+  add('action', {n:'Scacciare Non Morti', sub:`${M.sag}d8 radiosi ai non morti entro 9 m. ${cdw}`, btn:'data-a="turn"', dis:!cdOk, why:'nessun uso'});
+  add('action', {n:'Preservare Vita', sub:`30 PF ai Sanguinanti entro 9 m. ${cdw}`, btn:'data-a="preserve"', dis:!cdOk, why:'nessun uso'});
+  add('bonus', {n:'Cura Arborea', sub:'3d10 PF a te, una volta al giorno', btn:'data-a="arborea"', dis:!!S.arborea, why:'già usata oggi'});
+  S.items.filter(it => POTIONS[it.n] && it.q > 0).forEach(it => add('bonus', {n:it.n, sub:`cura ${POTIONS[it.n]}, ne hai ${it.q}`, btn:`data-a="drink" data-id="${it.id}"`}));
+  add('reaction', {n:'Attacco di opportunità', sub:'quando un nemico esce dalla tua portata: Martello da guerra', btn:'data-a="atk" data-econ="reaction"'});
+  add('reaction', {n:'Fiamma Sacra come attacco di opportunità', sub:'Incantatore da Guerra: al posto dell\'attacco con il martello', btn:'data-a="cantrip" data-econ="reaction" data-id="fiamma"'});
+  return o;
+}
+const BASIC = [['Scatto','raddoppi il movimento'],['Disimpegno','ti allontani senza attacchi di opportunità'],['Schivata','chi ti attacca ha svantaggio'],['Aiuto','un alleato ha vantaggio'],['Nascondersi','prova di Furtività'],['Usare un oggetto','oggetto che richiede un\'azione']];
+function turnSheet(){
+  const o = turnOptions(), left = turnLeft();
+  const opt = (k, x) => `<div class="topt${x.dis ? ' off' : ''}"><div class="rl"><b>${esc(x.n)}</b><div class="muted">${esc(x.sub || '')}${x.dis && x.why ? ` <em>(${esc(x.why)})</em>` : ''}</div></div><button class="btn sm${x.slot ? '' : ' primary'}" ${x.btn} data-turnk="${k}"${x.dis ? ' disabled' : ''}>Usa</button></div>`;
+  const sec = (k, title, help, extra = '') => turn[k]
+    ? `<div class="tsec done"><h3>${title}</h3><p class="muted">Usata: ${esc(turn[k])}. <button class="linkbtn" data-a="turntog" data-k="${k}">Segna come libera</button></p></div>`
+    : `<div class="tsec"><h3>${title}</h3><p class="muted">${help}</p>${(o[k] || []).map(x => opt(k, x)).join('')}${extra}</div>`;
+  return `<h2>Il tuo turno</h2>
+    <p class="tsum">${left.length ? `Ti restano: <b>${left.map(([, n]) => n.toLowerCase()).join(', ')}</b>.` : 'Hai già usato tutto in questo turno.'} ${turn.slot ? `Hai già usato uno slot (${esc(turn.slot)}): un solo incantesimo con slot per turno.` : 'Regola: un solo incantesimo con slot per turno. I trucchetti e Canalizzare Divinità non contano.'}${S.conc ? ` Sei concentrato su ${esc(S.conc)}.` : ''}</p>
+    ${turn.move ? `<div class="tsec done"><h3>Movimento</h3><p class="muted">Usato. <button class="linkbtn" data-a="turntog" data-k="move">Segna come libero</button></p></div>` : `<div class="tsec"><h3>Movimento</h3><p class="muted">${SPEED}. Puoi dividerlo prima e dopo l'azione.</p><div class="topt"><div class="rl"><b>Ho finito di muovermi</b></div><button class="btn sm" data-a="turntog" data-k="move">Segna</button></div></div>`}
+    ${sec('action', 'Azione', 'Una sola per turno.', `<div class="chips basic">${BASIC.map(([n, d]) => `<button class="btn sm" data-a="turnmark" data-k="action" data-l="${n}" title="${esc(d)}">${n}</button>`).join('')}</div><p class="muted small">${BASIC.map(([n, d]) => `${n}: ${d}`).join('. ')}.</p>`)}
+    ${sec('bonus', 'Azione bonus', 'Solo se hai qualcosa che la usa.')}
+    ${sec('reaction', 'Reazione', 'Una fino all\'inizio del tuo prossimo turno, anche nel turno degli altri.')}
+    <p class="muted small">Gratis: interagire con un oggetto (estrarre un'arma, aprire una porta) e parlare brevemente. I danni di Guardiani Spirituali arrivano da soli, senza azione.</p>
+    <div class="btns"><button class="btn" data-a="turnnew">Nuovo turno</button><button class="btn primary" data-a="close">Chiudi</button></div>`;
+}
 function renderCombat(){
   const down = S.hp.cur === 0;
   const pots = S.items.filter(it => POTIONS[it.n] && it.q > 0);
   const sg = S.conc === 'Guardiani Spirituali';
   document.getElementById('tab-combat').innerHTML = `
-  <details class="panel fold span2 turnguide" id="turnguide"${guideOpen ? ' open' : ''}><summary><h2>Il tuo turno</h2></summary><dl class="kv">${TURN_GUIDE.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></details>
+  ${turnPanel()}
+  <details class="panel fold span2 turnguide" id="turnguide"${guideOpen ? ' open' : ''}><summary><h2>Consigli per il turno</h2></summary><dl class="kv">${TURN_GUIDE.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></details>
   ${down ? `<div class="panel">
     <h2>A terra <small>0 punti ferita</small></h2>
     <p>A inizio turno tiri contro la morte: 10 o più è un successo, 20 ti rialza con 1 PF, 1 vale due fallimenti.</p>
@@ -1829,6 +1932,7 @@ const SHEETS = {
     <div class="restopt"><div><div class="rt"><b>Riposo lungo, almeno 8 ore</b>${rinfo('long')}</div><p class="muted">Tornano PF, slot, Canalizzare Divinità e Dadi Vita. Finiscono Aiuto, risucchio e concentrazione, e l'indebolimento scende di 1. Poi puoi cambiare gli incantesimi nel Grimorio.</p></div>
       <button class="btn primary" data-a="long">Fai un riposo lungo</button></div>
     <p class="muted" id="syncst" style="margin:12px 0 0">${SYNC_TXT[syncState]}</p>`; },
+  turn: () => turnSheet(),
   dice: () => { const l = S.log[0]; return `<h2>Dadi</h2>
     ${l ? `<div class="last"><span class="sealn${l.kind ? ' ' + l.kind : ''}${String(l.total).length > 2 ? ' long' : ''}" id="d-total">${esc(l.total)}</span><div><b id="d-lab">${esc(l.label)}</b><div class="muted" id="d-det">${esc(l.detail)}</div></div></div>` : ''}
     <h3>Il prossimo d20</h3>
@@ -1851,7 +1955,7 @@ function renderSheetUI(isNew){
   sc.hidden = !sheet; document.documentElement.classList.toggle('lock', !!sheet);
   if (!sheet) return;
   const keep = el.scrollTop;
-  el.setAttribute('aria-label', {info:'Dettagli', hp:'Punti ferita', rest:'Riposo', dice:'Dadi'}[sheet.kind]);
+  el.setAttribute('aria-label', {info:'Dettagli', hp:'Punti ferita', rest:'Riposo', dice:'Dadi', turn:'Il tuo turno'}[sheet.kind]);
   el.innerHTML = '<div class="grab"></div><button class="x" data-a="close" aria-label="Chiudi">×</button>' + SHEETS[sheet.kind](sheet.arg);
   el.scrollTop = isNew ? 0 : keep;
   if (isNew){ el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; el.focus({preventScroll:true}); }
@@ -1936,7 +2040,14 @@ document.addEventListener('click', e => {
   if (b.dataset.key){ key(b.dataset.key); return; }
   const a = b.dataset.a, id = b.dataset.id, i = +b.dataset.i;
   const hpVal = () => parseInt(hpBuf, 10);
+  if (b.disabled) return;
+  if (b.dataset.turnk && sheet && sheet.kind === 'turn') closeSheet();
+  markTurn(costOf(a, b));
   switch (a){
+    case 'turnopen': openSheet('turn'); break;
+    case 'turnnew': turn = freshTurn(); saveTurn(); render(); break;
+    case 'turntog': { const k = b.dataset.k; turn[k] = turn[k] ? '' : 'usata'; saveTurn(); render(); break; }
+    case 'turnmark': closeSheet(); render(); break;
     case 'fullscreen': toggleFs(); break;
     case 'close': closeSheet(); render(); break;
     case 'rclose': resultOpen = false; renderResult(); break;
@@ -1948,7 +2059,7 @@ document.addEventListener('click', e => {
       openSheet('rest'); break;
     }
     case 'gomagic': if (tab !== 'spells') resultOpen = false; tab = 'spells'; sub.spells = 'spells'; render(); window.scrollTo(0, 0); break;
-    case 'init': d20('Iniziativa', M.des); break;
+    case 'init': turn = freshTurn(); saveTurn(); d20('Iniziativa', M.des); break;
     case 'check': { const ab = ABIL.find(x => x.k === b.dataset.k); d20(`Prova di ${ab.n}`, M[ab.k]); break; }
     case 'save': { const k = b.dataset.k, sv = SAVES[k]; const ab = ABIL.find(x => x.k === k); d20(`TS ${ab.n}`, M[k] + (sv.prof ? PB : 0), {adv:sv.adv}); break; }
     case 'skill': { closeSheet(); const [n, k, p] = SKILLS[i]; d20(n, M[k] + (p ? PB : 0)); break; }
