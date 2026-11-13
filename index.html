@@ -989,8 +989,11 @@ const ITEM_INFO = {
   'Scudo dell\'Albero della Vita':{t:'Scudo +1 • oggetto magico evolutivo (richiede sintonia)',w:'6 lb',v:'—',p:'+3 CA (+2 dello scudo, +1 magico)',
     full:['Uno scudo d\'argento con un albero della vita scolpito in rilievo: le radici scendono fino al bordo e la chioma sembra brina cristallizzata.','Richiede sintonia. Mentre lo impugni hai +1 alla CA oltre al normale +2 dello scudo.','Cura Arborea: una volta al giorno, con un\'azione bonus, recuperi 3d10 punti ferita. Cura solo chi impugna lo scudo.','Oggetto evolutivo: diventa più potente insieme al suo proprietario.'],
     tip:'Cura Arborea è un\'azione bonus: nello stesso turno puoi usare l\'azione per Guardiani Spirituali o un trucchetto. Non è un incantesimo, quindi non usa slot e Discepolo della Vita non la potenzia.'},
+  'Medaglione di Ilmater':{t:'Simbolo sacro (amuleto)',w:'1 lb',v:'5 mo',p:'Focus per gli incantesimi',
+    full:['Un medaglione con l\'emblema di Ilmater, due mani legate ai polsi da un cordone rosso, portato al collo.','È il simbolo sacro di Kaean: lo usa come focus per le componenti materiali senza costo e lo punta verso il bersaglio per Canalizzare Divinità.','Va indossato in vista, oppure tenuto in mano.'],
+    tip:'Indossato al collo lascia libere le mani: martello in una, Scudo dell\'Albero della Vita nell\'altra.'},
   'Scudo della casata':{t:'Scudo',w:'6 lb',v:'10 mo',p:'+2 CA',
-    full:['Il vecchio scudo dell\'armeria della casata, staccato dalla parete la notte della partenza.','Sopra è dipinto l\'emblema di Ilmater, due mani legate ai polsi da un cordone rosso: funziona da simbolo sacro, quindi è il focus per gli incantesimi.','Si imbraccia o si toglie con un\'azione.'],
+    full:['Il vecchio scudo dell\'armeria della casata, staccato dalla parete la notte della partenza.','Sopra è dipinto l\'emblema di Ilmater, due mani legate ai polsi da un cordone rosso. Ora resta nello zaino: il simbolo sacro di Kaean è il Medaglione di Ilmater.','Si imbraccia o si toglie con un\'azione.'],
     tip:'Con Incantatore da Guerra puoi lanciare incantesimi con componenti somatiche anche con arma e scudo in mano.'},
   'Martello da guerra':{t:'Arma da guerra da mischia',w:'5 lb',v:'15 mo',p:'1d8 contundenti • versatile (1d10 a due mani)',
     full:[`Tiro per colpire ${fmt(PB + M.for)} (Forza + competenza grazie a Protettore).`,'Con lo scudo al braccio si usa a una mano (1d8). La maestria nelle armi non è disponibile per il chierico.'],
@@ -1211,7 +1214,8 @@ const isPrep = sp => (sp.l === 0 && !sp.x) || sp.dom || (S.prep || DEFAULT_PREP)
 const INIT_ITEMS = [
   ['Armatura completa di mithral',1,'CA 18 • oggetto non comune • indossata'],
   ['Scudo dell\'Albero della Vita',1,'+1 • sintonia • Cura Arborea 3d10 una volta al giorno • impugnato'],
-  ['Scudo della casata',1,'+2 CA • simbolo di Ilmater come emblema • nello zaino'],
+  ['Scudo della casata',1,'+2 CA • emblema di Ilmater • nello zaino'],
+  ['Medaglione di Ilmater',1,'Simbolo sacro al collo • focus per gli incantesimi'],
   ['Martello da guerra',1,'1d8 contundenti, versatile 1d10'],
   ['Dotazione da sacerdote',1,'Zaino, coperta, lampada, razioni per 7 giorni, veste, acciarino'],
   ['Acqua santa',3,'1 dalla dotazione + 2 comprate • componente di Protezione dal Bene e dal Male'],
@@ -1225,7 +1229,7 @@ const POTIONS = {'Pozione media di guarigione':'4d4+4','Pozione piccola di guari
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 const fresh = () => ({
-  v:6, updatedAt:0, prep:DEFAULT_PREP.slice(),
+  v:7, updatedAt:0, prep:DEFAULT_PREP.slice(),
   hp:{cur:BASE_HP,temp:0,aid:0,drain:0},
   hd:0, death:{s:0,f:0}, slots:{1:0,2:0,3:0}, cd:0, arborea:0,
   conc:'', conds:[], exh:0, insp:0,
@@ -1249,7 +1253,8 @@ const cur = () => TABS[tab].length > 1 ? sub[tab] : TABS[tab][0];
 const slotsLeft = L => SLOT_MAX[L] - S.slots[L];
 
 function migrate(st){
-  if ((st.v || 1) >= 6){ if (!Array.isArray(st.prep)) { st.prep = DEFAULT_PREP.slice(); return true; } return false; }
+  if ((st.v || 1) >= 7){ if (!Array.isArray(st.prep)) { st.prep = DEFAULT_PREP.slice(); return true; } return false; }
+  if ((st.v || 1) >= 6){ migrateV7(st); if (!Array.isArray(st.prep)) st.prep = DEFAULT_PREP.slice(); return true; }
   if ((st.v || 1) >= 5){ migrateV6(st); if (!Array.isArray(st.prep)) st.prep = DEFAULT_PREP.slice(); return true; }
   if ((st.v || 1) >= 4){ st.prep = DEFAULT_PREP.slice(); migrateV6(st); return true; }
   if ((st.v || 1) >= 3){ migrateV4(st); st.prep = DEFAULT_PREP.slice(); migrateV6(st); return true; }
@@ -1267,10 +1272,20 @@ function migrateV6(st){
   if (!st.items.some(x => x.n === 'Scudo dell\'Albero della Vita')){
     const old = st.items.findIndex(x => x.n === 'Scudo della casata');
     st.items.splice(old >= 0 ? old : 1, 0, {id:uid(), n:'Scudo dell\'Albero della Vita', q:1, note:'+1 • sintonia • Cura Arborea 3d10 una volta al giorno • impugnato'});
-    if (old >= 0) st.items[old + 1].note = '+2 CA • simbolo di Ilmater come emblema • nello zaino';
   }
   if (typeof st.arborea !== 'number') st.arborea = 0;
   st.v = 6;
+  migrateV7(st);
+}
+function migrateV7(st){
+  if (!Array.isArray(st.items)) st.items = [];
+  const old = st.items.find(x => x.n === 'Scudo della casata');
+  if (old) old.note = '+2 CA • emblema di Ilmater • nello zaino';
+  if (!st.items.some(x => x.n === 'Medaglione di Ilmater')){
+    const at = old ? st.items.indexOf(old) + 1 : st.items.length;
+    st.items.splice(at, 0, {id:uid(), n:'Medaglione di Ilmater', q:1, note:'Simbolo sacro al collo • focus per gli incantesimi'});
+  }
+  st.v = 7;
 }
 function migrateV4(st){
   const sh = st.items.find(x => x.n === 'Scudo di Garrik');
