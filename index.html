@@ -1679,6 +1679,15 @@ function turnPanel(){
     ${turnStarted() ? `<button class="linkbtn" data-a="turnall">${turn.all ? 'Nascondi quello che hai già usato' : 'Mostra tutto'}</button>` : ''}
   </div>`;
 }
+function combatSpells(){
+  const list = SPELLS.filter(s => s.l > 0 && isPrep(s) && econOf(s));
+  const groups = [['bonus','Con l\'azione bonus'],['action','Con l\'azione'],['reaction','Con la reazione']];
+  return `<div class="panel">
+    <h2>Incantesimi preparati <small>${slotsLeft(1)}/${slotsLeft(2)}/${slotsLeft(3)} slot</small></h2>
+    ${groups.map(([k, t]) => { const xs = list.filter(s => econOf(s) === k); return xs.length ? `<h3>${t}</h3>${xs.map(spellHtml).join('')}` : ''; }).join('')}
+    <p class="muted">Tocca un incantesimo per scegliere lo slot e lanciarlo. Quelli che richiedono più tempo, come Preghiera di Guarigione, sono in Magia.</p>
+  </div>`;
+}
 function renderCombat(){
   const down = S.hp.cur === 0;
   const pots = S.items.filter(it => POTIONS[it.n] && it.q > 0);
@@ -1715,6 +1724,7 @@ function renderCombat(){
     </div>
     <p class="muted">Regola 2024: un solo slot di incantesimo per turno.</p>
   </div>
+  ${combatSpells()}
   ${cdPanel()}
   ${slotPanel()}
   <div class="panel">
