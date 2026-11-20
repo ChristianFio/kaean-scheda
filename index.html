@@ -1254,6 +1254,7 @@ Object.assign(INFO, {
 SPELLS.push(
   {id:'auravita',n:'Aura di Vita',l:4,t:'Azione • emanazione 9 m',c:1,dom:1,d:'Alleati entro 9 m: resistenza ai danni necrotici, PF massimi non riducibili, chi è a 0 PF recupera 1 PF a inizio turno.'},
   {id:'interdmorte',n:'Interdizione alla Morte',l:4,t:'Azione • contatto • 8 ore',dom:1,d:'La prima volta che il bersaglio scenderebbe a 0 PF resta a 1. Annulla anche un effetto di morte istantanea.'},
+  {id:'auravit',n:'Aura di Vitalità',l:3,t:'Azione • emanazione 9 m',c:1,d:'Per 1 minuto, ogni turno con l\'azione bonus curi 2d6 a una creatura nell\'aura (anche te).'},
   {id:'guardfede',n:'Guardiano della Fede',l:4,t:'Azione • 9 m • 8 ore',d:`Un guardiano spettrale: i nemici che si avvicinano entro 3 m, TS Destrezza CD ${DC}, 20 radiosi (metà se riesce). Svanisce dopo 60 danni. Senza concentrazione.`},
   {id:'esilio',n:'Esilio',l:4,t:'Azione • 18 m',c:1,d:`TS Carisma CD ${DC} o il bersaglio sparisce in un semipiano per 1 minuto.`},
   {id:'libertamov',n:'Libertà di Movimento',l:4,t:'Azione • contatto • 1 ora',d:'Immune a paralisi e trattenimento magici, il terreno difficile non rallenta, ti liberi dalle prese con 1,5 m di movimento.'},
@@ -1269,6 +1270,10 @@ Object.assign(INFO, {
   interdmorte:{s:'Abiurazione',ct:'Azione',rg:'Contatto',cp:'V, S',du:'8 ore',
     full:['La prima volta che il bersaglio scenderebbe a 0 punti ferita, scende invece a 1 PF e l\'incantesimo termina.','Se il bersaglio subisce un effetto che lo ucciderebbe all\'istante senza fare danni, l\'effetto non ha luogo e l\'incantesimo termina.'],
     tip:'Al mattino su Kaean (o sul tuo signore) con l\'unico slot di 4°: 8 ore di assicurazione contro la caduta, senza concentrazione.'},
+  auravit:{s:'Invocazione',ct:'Azione',rg:'Sé (emanazione di 9 m)',cp:'V',du:'Concentrazione, fino a 1 minuto',
+    full:['Un\'aura di energia curativa ti circonda per 9 m e si muove con te.','Finché dura, puoi usare l\'azione bonus per far recuperare 2d6 PF a una creatura nell\'aura, compreso te.'],
+    up:'+1d6 per ogni livello di slot sopra il 3°.',
+    tip:'Fuori dal combattimento è la cura più efficiente: con uno slot di 3° fai fino a 10 cure da 2d6, circa 70 PF da dividere nel gruppo. Disciplina della Vita aggiunge +5 alla prima cura, quella del turno in cui lo lanci.'},
   guardfede:{s:'Evocazione',ct:'Azione',rg:'9 m',cp:'V',du:'8 ore',
     full:['Un guardiano spettrale di taglia Grande appare in uno spazio libero entro gittata e resta lì.',`Quando un nemico si muove entro 3 m da lui per la prima volta in un turno, o vi inizia il turno, fa un TS di Destrezza (CD ${DC}): 20 danni radiosi se fallisce, metà se riesce.`,'Il guardiano svanisce dopo aver inflitto 60 danni in totale. Non richiede concentrazione.'],
     tip:'Si somma ai Guardiani Spirituali. Mettilo davanti a una porta o accanto al tuo signore: chi si avvicina prende 20 radiosi.'},
